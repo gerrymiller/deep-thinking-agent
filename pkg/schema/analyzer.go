@@ -161,8 +161,12 @@ Focus on:
 func (a *Analyzer) parseAnalysisResponse(response, docID, format string) (*DocumentSchema, error) {
 	// Try to extract JSON from response (LLM might include explanation text)
 	jsonStart := findJSONStart(response)
+	if jsonStart == -1 {
+		return nil, fmt.Errorf("no valid JSON found in LLM response")
+	}
+
 	jsonEnd := findJSONEnd(response[jsonStart:])
-	if jsonStart == -1 || jsonEnd == -1 {
+	if jsonEnd == -1 {
 		return nil, fmt.Errorf("no valid JSON found in LLM response")
 	}
 

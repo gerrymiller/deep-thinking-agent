@@ -21,7 +21,17 @@ func (c *SemanticChunker) Chunk(content string, docSchema *schema.DocumentSchema
 	if len(docSchema.SemanticRegions) == 0 {
 		// Fall back to section-based if no semantic regions
 		fallback := NewSectionBasedChunker()
-		return fallback.Chunk(content, docSchema)
+		chunks, err := fallback.Chunk(content, docSchema)
+		if err != nil {
+			return nil, err
+		}
+		// Update method name in metadata
+		for i := range chunks {
+			if chunks[i].Metadata != nil {
+				chunks[i].Metadata.ChunkMethod = "semantic"
+			}
+		}
+		return chunks, nil
 	}
 
 	chunks := make([]Chunk, 0)

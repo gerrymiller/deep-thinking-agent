@@ -166,11 +166,18 @@ func (r *Resolver) enhanceWithLLM(ctx context.Context, schema *DocumentSchema, c
 	return schema, nil
 }
 
-// contains checks if text contains a substring (case-insensitive).
+// contains checks if text contains a substring.
 func contains(text, substr string) bool {
-	// Simple implementation for now
-	// TODO: Add case-insensitive matching
-	return len(text) > 0 && len(substr) > 0
+	if len(substr) == 0 {
+		return false
+	}
+	// Simple substring search
+	for i := 0; i <= len(text)-len(substr); i++ {
+		if text[i:i+len(substr)] == substr {
+			return true
+		}
+	}
+	return false
 }
 
 // SchemaCache provides caching for resolved schemas.

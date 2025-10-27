@@ -58,12 +58,36 @@ Every `.go` source file **authored as part of this project** MUST include this h
 For new files created in future years, update the copyright year accordingly.
 
 ### Test Coverage
-- **Target: 100% test coverage** for all packages
+
+**CRITICAL: Tests are MANDATORY, not optional. Never commit code without tests.**
+
+#### Non-Negotiable Testing Requirements:
+1. **EVERY new package MUST have tests before committing**
+2. **EVERY new `.go` file MUST have a corresponding `_test.go` file**
+3. **Target: 100% test coverage** - measure with `go test -cover ./...`
+4. **Tests must be written BEFORE the commit**, not after
+5. **Run `go test ./...` and verify ALL tests pass before every commit**
+
+#### Test Quality Standards:
 - Write comprehensive unit tests for all exported functions and types
 - Use table-driven tests following Go best practices
 - Include both positive and negative test cases
 - Test error handling paths explicitly
-- Add integration tests where appropriate (use build tags)
+- Test edge cases and boundary conditions
+- Add integration tests where appropriate (use build tags like `//go:build integration`)
+
+#### Testing Workflow (MUST FOLLOW):
+```
+1. Write code
+2. Write tests for that code
+3. Run: go test ./...
+4. Verify: All tests pass
+5. Run: go test -cover ./...
+6. Verify: Acceptable coverage (aim for 100%)
+7. ONLY THEN commit
+```
+
+**If you find yourself committing code without tests, STOP and write the tests first.**
 
 ### Code Quality
 - All code must pass `go fmt`
