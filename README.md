@@ -87,8 +87,9 @@ For detailed architecture documentation, see [CLAUDE.md](./CLAUDE.md).
 ### Prerequisites
 
 - **Go 1.25.3+**
-- **Qdrant** vector database (for Phase 1)
+- **Qdrant** vector database
 - **OpenAI API key** (for LLM and embeddings)
+- **Docker** (optional, for running Qdrant)
 
 ### Installation
 
@@ -100,37 +101,62 @@ cd deep-thinking-agent
 # Install dependencies
 go mod download
 
+# Build the CLI
+go build -o bin/deep-thinking-agent ./cmd/cli
+
 # Run tests
 go test ./...
 ```
 
+### Start Qdrant Vector Database
+
+```bash
+# Using Docker
+docker run -d -p 6333:6333 -p 6334:6334 qdrant/qdrant
+
+# Verify it's running
+curl http://localhost:6333/collections
+```
+
 ### Configuration
 
-Create a configuration file `config.json`:
+Initialize a default configuration:
+
+```bash
+./bin/deep-thinking-agent config init
+```
+
+This creates `config.json`. Edit it to add your API key, or set environment variable:
+
+```bash
+export OPENAI_API_KEY="your-openai-key-here"
+```
+
+Validate your configuration:
+
+```bash
+./bin/deep-thinking-agent config validate config.json
+```
+
+Example configuration:
 
 ```json
 {
   "llm": {
     "reasoning_llm": {
       "provider": "openai",
-      "api_key": "your-openai-key",
       "model": "gpt-4",
-      "default_temperature": 0.7,
-      "default_max_tokens": 2048
+      "default_temperature": 0.7
     },
     "fast_llm": {
       "provider": "openai",
-      "api_key": "your-openai-key",
       "model": "gpt-3.5-turbo",
-      "default_temperature": 0.5,
-      "default_max_tokens": 1024
+      "default_temperature": 0.5
     }
   },
   "embedding": {
     "provider": "openai",
-    "api_key": "your-openai-key",
-    "model": "text-embedding-3-small",
-    "batch_size": 100
+    "model": "text-embedding-3-small"
   },
   "vector_store": {
     "type": "qdrant",
@@ -140,23 +166,92 @@ Create a configuration file `config.json`:
   "workflow": {
     "max_iterations": 10,
     "top_k_retrieval": 10,
-    "top_n_reranking": 3,
-    "default_strategy": "hybrid"
+    "top_n_reranking": 3
   }
 }
 ```
 
-Or use environment variables:
+Environment variables override config file values:
 
 ```bash
-export REASONING_LLM_PROVIDER=openai
-export REASONING_LLM_API_KEY=your-key
+export OPENAI_API_KEY=your-key
 export REASONING_LLM_MODEL=gpt-4
-export VECTOR_STORE_TYPE=qdrant
 export VECTOR_STORE_ADDRESS=localhost:6334
 ```
 
-### Basic Usage (Phase 1)
+### CLI Usage
+
+#### Ingest Documents
+
+```bash
+# Ingest a single document
+./bin/deep-thinking-agent ingest document.txt
+
+# Ingest all documents in a directory
+./bin/deep-thinking-agent ingest -recursive ./documents
+
+# Ingest with verbose output
+./bin/deep-thinking-agent ingest -verbose document.md
+
+# Ingest to a custom collection
+./bin/deep-thinking-agent ingest -collection research ./papers
+```
+
+#### Query Documents
+
+```bash
+# Single query
+./bin/deep-thinking-agent query "What are the main risk factors?"
+
+# Interactive mode
+./bin/deep-thinking-agent query -interactive
+
+# Verbose mode (shows reasoning steps)
+./bin/deep-thinking-agent query -verbose "Summarize the key findings"
+
+# Control max reasoning iterations
+./bin/deep-thinking-agent query -max-iterations 15 "Complex question"
+```
+
+#### Configuration Management
+
+```bash
+# Initialize default config
+./bin/deep-thinking-agent config init
+
+# Show current config
+./bin/deep-thinking-agent config show
+
+# Validate config
+./bin/deep-thinking-agent config validate config.json
+```
+
+### Automated Examples
+
+Run the complete workflow with provided examples:
+
+```bash
+# 1. Setup and build
+./examples/01_setup.sh
+
+# 2. Ingest sample documents
+./examples/02_ingest.sh
+
+# 3. Run simple queries
+./examples/03_query.sh
+
+# 4. Run advanced multi-hop queries
+./examples/04_advanced.sh
+
+# 5. Explore ingestion patterns
+./examples/05_ingestion_patterns.sh
+```
+
+See [examples/README.md](examples/README.md) for detailed documentation.
+
+### Go Library Usage
+
+You can also use Deep Thinking Agent as a Go library:
 
 ```go
 package main
@@ -165,63 +260,32 @@ import (
     "context"
     "log"
 
-    "deep-thinking-agent/internal/config"
-    "deep-thinking-agent/pkg/llm/openai"
-    "deep-thinking-agent/pkg/embedding"
-    "deep-thinking-agent/pkg/vectorstore/qdrant"
+    "deep-thinking-agent/cmd/common"
 )
 
 func main() {
     // Load configuration
-    cfg, err := config.LoadFromFile("config.json")
+    config, err := common.LoadConfig("config.json")
     if err != nil {
         log.Fatal(err)
     }
 
-    // Initialize LLM provider
-    llmProvider, err := openai.NewProvider(
-        cfg.LLM.ReasoningLLM.APIKey,
-        cfg.LLM.ReasoningLLM.Model,
-        cfg.ToLLMConfig(),
-    )
+    // Initialize system
+    system, err := common.InitializeSystem(config)
     if err != nil {
         log.Fatal(err)
     }
+    defer system.Close()
 
-    // Initialize embedder
-    embedder, err := embedding.NewOpenAIEmbedder(
-        cfg.Embedding.APIKey,
-        cfg.Embedding.Model,
-        cfg.ToEmbeddingConfig(),
-    )
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    // Initialize vector store
-    vectorStore, err := qdrant.NewStore(
-        cfg.VectorStore.Address,
-        cfg.ToVectorStoreConfig(),
-    )
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer vectorStore.Close()
-
-    // Use components...
+    // Execute a query
     ctx := context.Background()
-
-    // Example: Generate completion
-    resp, err := llmProvider.Complete(ctx, &llm.CompletionRequest{
-        Messages: []llm.Message{
-            {Role: "user", Content: "What is deep thinking RAG?"},
-        },
-    })
+    state := workflow.NewState("What are the main applications of AI in healthcare?")
+    result, err := system.Executor.Execute(ctx, state)
     if err != nil {
         log.Fatal(err)
     }
 
-    log.Println("Response:", resp.Content)
+    log.Println("Answer:", result.FinalAnswer)
 }
 ```
 
@@ -303,7 +367,7 @@ All code must:
 4. Add unit tests
 5. Document supported formats
 
-## Implementation Roadmap
+## Implementation Status
 
 ### Phase 1: Foundation ✅ (Completed)
 - Core interfaces (LLM, Embedding, VectorStore, Parser)
@@ -312,30 +376,41 @@ All code must:
 - Text and Markdown parsers
 - State machine definitions
 - Configuration system
+- Comprehensive test coverage
 
-### Phase 2: Schema System (In Progress)
+### Phase 2: Schema System ✅ (Completed)
 - LLM-based schema analyzer
+- Schema resolver with multiple strategies
 - Multi-level schema storage
-- Schema-aware chunking strategies
-- Schema registry with predefined patterns
-- PDF and HTML parsers
+- Schema-aware chunking
+- Schema registry with pattern matching
+- Enhanced metadata handling
 
-### Phase 3: Agents & Retrieval (Planned)
-- All 8 specialized agents
+### Phase 3: Agents & Retrieval ✅ (Completed)
+- All 8 specialized agents implemented
+- Planner, Rewriter, Supervisor agents
+- Retriever with schema-aware filtering
+- Reranker with cross-encoder support
+- Distiller for context synthesis
+- Reflector for step summarization
+- Policy agent for decision logic
 - Vector, keyword, and hybrid retrieval strategies
-- Cross-encoder reranking
-- Schema-filtered retrieval
 
-### Phase 4: Workflow Execution (Planned)
+### Phase 4: Workflow Execution ✅ (Completed)
 - Graph-based workflow construction
 - Deep thinking loop orchestration
 - State machine executor
-- Policy decision logic
+- Node-based agent wrappers
+- Complete integration testing
+- Timeout and error handling
 
-### Phase 5: Interfaces (Planned)
-- CLI tool for interactive queries
-- HTTP/gRPC API server
-- Usage examples and tutorials
+### Phase 5: CLI Interface ✅ (Completed)
+- Full-featured CLI tool
+- Interactive query mode
+- Document ingestion with recursive support
+- Configuration management commands
+- Comprehensive examples and documentation
+- Automated example scripts
 
 ## Contributing
 

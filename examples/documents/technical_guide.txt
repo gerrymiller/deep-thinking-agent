@@ -1,0 +1,218 @@
+KUBERNETES DEPLOYMENT GUIDE
+=============================
+
+Introduction
+------------
+This guide covers best practices for deploying applications to Kubernetes clusters. It assumes familiarity with Docker and basic Kubernetes concepts.
+
+Prerequisites
+-------------
+- Kubernetes cluster (v1.25 or higher)
+- kubectl CLI tool installed
+- Docker installed locally
+- Access to a container registry
+
+Architecture Overview
+--------------------
+A typical Kubernetes deployment consists of:
+
+1. Namespace - Logical isolation boundary
+2. Deployments - Manage pod replicas
+3. Services - Expose pods to network traffic
+4. ConfigMaps - Store configuration data
+5. Secrets - Store sensitive data
+6. Ingress - External access routing
+
+Creating a Namespace
+-------------------
+Namespaces provide logical separation between applications:
+
+  kubectl create namespace myapp-production
+  kubectl config set-context --current --namespace=myapp-production
+
+Building Container Images
+-------------------------
+Best practices for container images:
+
+- Use official base images
+- Minimize layer count
+- Don't run as root
+- Use multi-stage builds
+- Scan for vulnerabilities
+
+Example Dockerfile:
+
+  FROM node:18-alpine AS builder
+  WORKDIR /app
+  COPY package*.json ./
+  RUN npm ci --only=production
+
+  FROM node:18-alpine
+  RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
+  WORKDIR /app
+  COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+  COPY --chown=nodejs:nodejs . .
+  USER nodejs
+  EXPOSE 3000
+  CMD ["node", "server.js"]
+
+Deployment Configuration
+-----------------------
+A deployment ensures desired number of pod replicas:
+
+Key configuration options:
+- replicas: Number of pod instances
+- strategy: Rolling update or recreate
+- resources: CPU/memory requests and limits
+- probes: Health check configuration
+
+Example deployment.yaml:
+
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: myapp
+  spec:
+    replicas: 3
+    selector:
+      matchLabels:
+        app: myapp
+    template:
+      metadata:
+        labels:
+          app: myapp
+      spec:
+        containers:
+        - name: myapp
+          image: registry.example.com/myapp:v1.2.3
+          ports:
+          - containerPort: 3000
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+Service Configuration
+--------------------
+Services expose pods to network traffic:
+
+Service types:
+- ClusterIP: Internal cluster access only
+- NodePort: Expose on each node's IP
+- LoadBalancer: Cloud provider load balancer
+- ExternalName: DNS CNAME redirect
+
+Example service.yaml:
+
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: myapp-service
+  spec:
+    type: LoadBalancer
+    selector:
+      app: myapp
+    ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+
+ConfigMaps and Secrets
+---------------------
+Store configuration separately from code:
+
+ConfigMap example:
+  kubectl create configmap app-config --from-file=config.json
+
+Secret example:
+  kubectl create secret generic app-secrets --from-literal=api-key=xyz123
+
+Reference in deployment:
+  env:
+  - name: API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: app-secrets
+        key: api-key
+
+Ingress Configuration
+--------------------
+Route external traffic to services:
+
+  apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    name: myapp-ingress
+  spec:
+    rules:
+    - host: myapp.example.com
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: myapp-service
+              port:
+                number: 80
+
+Deployment Best Practices
+-------------------------
+1. Use resource requests and limits
+2. Implement health checks (liveness and readiness probes)
+3. Use rolling updates with proper maxSurge/maxUnavailable
+4. Store configuration in ConfigMaps
+5. Never commit secrets to version control
+6. Use pod anti-affinity for high availability
+7. Implement horizontal pod autoscaling
+8. Set up monitoring and logging
+9. Use namespaces for environment separation
+10. Regularly update base images and dependencies
+
+Monitoring and Logging
+---------------------
+Essential for production deployments:
+
+Monitoring:
+- Install Prometheus and Grafana
+- Configure ServiceMonitors
+- Set up alerting rules
+- Monitor resource usage
+
+Logging:
+- Deploy logging stack (EFK or Loki)
+- Configure log aggregation
+- Set up log retention policies
+- Create dashboards for log analysis
+
+Troubleshooting
+--------------
+Common issues and solutions:
+
+ImagePullBackOff:
+- Check image name and tag
+- Verify registry credentials
+- Confirm image exists
+
+CrashLoopBackOff:
+- Check container logs: kubectl logs <pod-name>
+- Verify application configuration
+- Check resource limits
+
+Pending Pods:
+- Insufficient cluster resources
+- Node selector/affinity issues
+- PersistentVolume not available
+
+Conclusion
+----------
+Following these practices will help ensure reliable Kubernetes deployments. Always test thoroughly in staging before deploying to production.
