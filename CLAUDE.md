@@ -1,15 +1,18 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to AI assistants when working with code in this repository.
 
 ## Project Overview
 
-This is a Go project named "deep-thinking-agent" using Go 1.25.3. The project appears to be in early stages of development.
+**Deep Thinking Agent** is a schema-driven RAG system using Go 1.25.3. It implements an iterative deep thinking loop for complex, multi-hop queries across generic document types using LLM-derived schemas and pluggable components.
 
-## Working with Claude Code
+**Author**: Gerry Miller <gerry@gerrymiller.com>
+**License**: MIT
+
+## Working with AI Assistants
 
 ### Proactive Optimization
-When working in this repository, Claude Code instances should:
+When working in this repository, AI assistants should:
 
 1. **Be Proactive, Not Reactive** - Don't just complete the task asked. Continuously assess the project state and optimize related configurations, documentation, and code without waiting to be prompted.
 
@@ -22,11 +25,48 @@ When working in this repository, Claude Code instances should:
 
 4. **Complete the Full Picture** - If setting up infrastructure (documentation, CI/CD, tooling), ensure ALL related components are configured optimally, not just the minimum required.
 
-### Claude Code Specific Configuration
+### AI Assistant Configuration
 - `.claude/settings.json` - Team-wide settings (commit to git)
 - `.claude/settings.local.json` - Personal preferences (in .gitignore)
 - `.claude/commands/` - Custom slash commands (commit to git)
-- Always verify configuration patterns against [official documentation](https://docs.claude.com/en/docs/claude-code/)
+
+## Code Standards
+
+All code in this repository must adhere to these standards:
+
+### File Headers
+Every `.go` source file MUST include this header:
+
+```go
+// Copyright 2025 Gerry Miller <gerry@gerrymiller.com>
+//
+// Licensed under the MIT License.
+// See LICENSE file in the project root for full license information.
+```
+
+For new files created in future years, update the copyright year accordingly.
+
+### Test Coverage
+- **Target: 100% test coverage** for all packages
+- Write comprehensive unit tests for all exported functions and types
+- Use table-driven tests following Go best practices
+- Include both positive and negative test cases
+- Test error handling paths explicitly
+- Add integration tests where appropriate (use build tags)
+
+### Code Quality
+- All code must pass `go fmt`
+- All code must pass `go vet`
+- Run `golangci-lint run` if available
+- Follow [Effective Go](https://go.dev/doc/effective_go) conventions
+- Document all exported types, functions, and constants
+- Keep functions focused and testable
+
+### Documentation
+- Update CLAUDE.md when adding new architectural components
+- Update README.md for user-facing changes
+- Include inline comments for complex logic
+- Write clear commit messages following conventional commits style
 
 ## Git Workflow
 
@@ -309,37 +349,170 @@ Configuration via JSON file or environment variables (see `internal/config/confi
 
 ### Implementation Status
 
-**Phase 1: Foundation** ✅ (Current)
-- Core interfaces (LLM, Embedding, VectorStore, Parser)
-- Basic implementations (OpenAI LLM/embeddings, Qdrant)
-- Document parsers (text, markdown; PDF/HTML in Phase 2)
-- State definitions
-- Configuration management
-- Unit tests
+#### Phase 1: Foundation ✅ (Completed)
 
-**Phase 2: Schema System** (Next)
-- LLM-based schema analyzer
-- Multi-level schema storage
-- Schema-aware chunking
-- Schema registry with predefined patterns
-- PDF and HTML parsers
+**Goal**: Establish core abstractions and basic implementations
 
-**Phase 3: Agents & Retrieval** (Planned)
-- All 8 agent implementations
-- Retrieval strategies (vector, keyword, hybrid)
-- Cross-encoder reranking
-- Schema-filtered retrieval
+**Completed Components**:
+- ✅ `pkg/llm/` - LLM provider interface with OpenAI implementation
+- ✅ `pkg/embedding/` - Embedding interface with OpenAI embedder (batch processing, configurable dimensions)
+- ✅ `pkg/vectorstore/` - Vector store interface with Qdrant implementation (full CRUD, metadata filtering)
+- ✅ `pkg/document/parser/` - Parser interface with text and markdown implementations
+- ✅ `pkg/schema/types.go` - Complete type definitions for schema system
+- ✅ `pkg/workflow/state.go` - State machine types and helper methods
+- ✅ `internal/config/` - JSON and environment-based configuration
+- ✅ Comprehensive unit tests for all components
 
-**Phase 4: Workflow Execution** (Planned)
-- Graph construction
-- Deep thinking loop orchestration
-- State machine execution
-- Policy decisions
+**Key Files**: 18 Go source files, 3 test files, all passing
 
-**Phase 5: Interfaces** (Planned)
-- CLI tool
-- HTTP/gRPC API
-- Usage examples
+---
+
+#### Phase 2: Schema System (Next)
+
+**Goal**: Implement LLM-based document schema analysis and multi-level storage
+
+**Tasks**:
+1. **Schema Analyzer** (`pkg/schema/analyzer.go`)
+   - LLM-powered schema derivation
+   - Identify sections, hierarchy, semantic regions
+   - Extract custom attributes
+   - Generate chunking strategy recommendations
+
+2. **Schema Resolver** (`pkg/schema/resolver.go`)
+   - Implement resolution strategy (explicit → pattern → LLM → hybrid)
+   - Pattern matching for common document types
+   - Caching and performance optimization
+
+3. **Schema Registry** (`pkg/schema/registry.go`)
+   - Store and retrieve schema patterns
+   - Pattern matching logic
+   - CRUD operations for predefined schemas
+
+4. **Schema Storage** (`pkg/schema/metadata.go`)
+   - Chunk-level metadata generation
+   - Document-level index management
+   - Registry integration
+
+5. **Schema-Aware Chunking** (`pkg/document/chunker/`)
+   - Section-based chunking
+   - Hierarchical chunking
+   - Semantic region chunking
+   - Sliding window with schema boundaries
+
+6. **Enhanced Parsers**
+   - PDF parser using `pdfcpu` or similar
+   - HTML parser using `golang.org/x/net/html`
+
+**Tests**: Unit tests for all analyzer logic, resolver strategies, and chunking methods
+
+**Success Criteria**: Can ingest any document, derive schema, chunk appropriately, and store with metadata
+
+---
+
+#### Phase 3: Agents & Retrieval (Planned)
+
+**Goal**: Implement all specialized agents and retrieval strategies
+
+**Tasks**:
+1. **Agent Implementations** (`pkg/agent/`)
+   - `planner.go` - Query decomposition using reasoning LLM
+   - `rewriter.go` - Query enhancement using fast LLM
+   - `supervisor.go` - Strategy selection (vector/keyword/hybrid)
+   - `retriever.go` - Schema-aware retrieval with filtering
+   - `reranker.go` - Cross-encoder reranking (consider using Cohere or local model)
+   - `distiller.go` - Context synthesis and compression
+   - `reflector.go` - Step summarization
+   - `policy.go` - Continue/finish decision logic
+
+2. **Retrieval Strategies** (`pkg/retrieval/`)
+   - `vector.go` - Pure semantic search
+   - `keyword.go` - BM25 implementation
+   - `hybrid.go` - RRF (Reciprocal Rank Fusion) combination
+   - `schema.go` - Schema-filtered retrieval with metadata
+
+3. **Integration**
+   - Connect agents to workflow state
+   - Implement agent factory pattern
+   - Add configuration for agent behavior
+
+**Tests**: Unit tests for each agent's logic, integration tests for retrieval strategies
+
+**Success Criteria**: All 8 agents working independently with comprehensive tests
+
+---
+
+#### Phase 4: Workflow Execution (Planned)
+
+**Goal**: Implement graph-based workflow orchestration
+
+**Tasks**:
+1. **Graph Construction** (`pkg/workflow/graph.go`)
+   - Define workflow graph structure
+   - Node definitions and edges
+   - Conditional routing logic
+
+2. **Executor** (`pkg/workflow/executor.go`)
+   - State machine execution engine
+   - Node invocation and result handling
+   - Error propagation and recovery
+
+3. **Workflow Nodes** (`pkg/workflow/nodes.go`)
+   - Node wrappers for each agent
+   - State transformation logic
+   - Route decision functions
+
+4. **Deep Thinking Loop**
+   - Plan → Route → Retrieve → Rerank → Compress → Reflect → Policy
+   - Iteration management
+   - History accumulation
+
+5. **End-to-End Integration**
+   - Connect all phases (parsing → schema → agents → workflow)
+   - Complete query execution pipeline
+
+**Tests**: Integration tests for complete workflow execution
+
+**Success Criteria**: Can execute complex multi-hop queries end-to-end
+
+---
+
+#### Phase 5: Interfaces (Planned)
+
+**Goal**: Provide user-facing interfaces
+
+**Tasks**:
+1. **CLI Tool** (`cmd/cli/`)
+   - Interactive query interface
+   - Document ingestion commands
+   - Configuration management
+   - Status and monitoring
+
+2. **HTTP API** (`cmd/api/`)
+   - RESTful API for queries
+   - Document upload endpoints
+   - WebSocket for streaming responses
+   - API documentation (OpenAPI/Swagger)
+
+3. **gRPC API** (optional)
+   - High-performance interface
+   - Streaming support
+   - Proto definitions
+
+4. **Examples** (`examples/`)
+   - Basic usage example
+   - Multi-hop query example
+   - Custom agent example
+   - Predefined schema example
+
+5. **Documentation**
+   - API documentation
+   - Usage tutorials
+   - Architecture diagrams
+   - Performance tuning guide
+
+**Tests**: E2E tests for all interfaces
+
+**Success Criteria**: Production-ready interfaces with comprehensive documentation
 
 ### Adding New Components
 

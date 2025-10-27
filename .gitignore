@@ -10,6 +10,9 @@
 
 # Output of the go coverage tool
 *.out
+coverage.txt
+coverage.html
+*.cover
 
 # Dependency directories
 vendor/
@@ -45,9 +48,12 @@ Thumbs.db
 *.swo
 *~
 
-# Environment variables
+# Environment variables and configuration with secrets
 .env
 .env.local
+config.json
+*-secrets.json
+*-local.json
 
 # Logs
 *.log
