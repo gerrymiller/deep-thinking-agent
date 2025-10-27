@@ -6,6 +6,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Go project named "deep-thinking-agent" using Go 1.25.3. The project appears to be in early stages of development.
 
+## Working with Claude Code
+
+### Proactive Optimization
+When working in this repository, Claude Code instances should:
+
+1. **Be Proactive, Not Reactive** - Don't just complete the task asked. Continuously assess the project state and optimize related configurations, documentation, and code without waiting to be prompted.
+
+2. **Think Holistically** - When touching one file or system, consider all related files that might need updates:
+   - When updating CLAUDE.md → Check if .gitignore needs optimization
+   - When adding dependencies → Check if CLAUDE.md needs documentation updates
+   - When changing architecture → Check if both code AND documentation reflect changes
+
+3. **Verify Before Assuming** - When configuring tooling (Claude Code, Git, CI/CD), always check official documentation before making assumptions about file patterns, naming conventions, or best practices.
+
+4. **Complete the Full Picture** - If setting up infrastructure (documentation, CI/CD, tooling), ensure ALL related components are configured optimally, not just the minimum required.
+
+### Claude Code Specific Configuration
+- `.claude/settings.json` - Team-wide settings (commit to git)
+- `.claude/settings.local.json` - Personal preferences (in .gitignore)
+- `.claude/commands/` - Custom slash commands (commit to git)
+- Always verify configuration patterns against [official documentation](https://docs.claude.com/en/docs/claude-code/)
+
 ## Git Workflow
 
 This project follows a gitflow-like branching strategy:
