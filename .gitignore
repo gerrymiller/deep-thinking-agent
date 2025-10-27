@@ -51,3 +51,10 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Claude Code
+.claude/settings.json
+.claude/cache/
+.claude/history/
+.claude/*.log
+# Keep .claude/commands/ - those should be committed
