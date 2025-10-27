@@ -35,7 +35,7 @@ When working in this repository, AI assistants should:
 All code in this repository must adhere to these standards:
 
 ### File Headers
-Every `.go` source file MUST include this header:
+Every `.go` source file **authored as part of this project** MUST include this header:
 
 ```go
 // Copyright 2025 Gerry Miller <gerry@gerrymiller.com>
@@ -43,6 +43,17 @@ Every `.go` source file MUST include this header:
 // Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 ```
+
+**Important**: Only add headers to files in these directories:
+- `pkg/` - Public packages authored for this project
+- `internal/` - Internal packages
+- `cmd/` - Command-line tools
+
+**Never** add headers to:
+- `vendor/` - Third-party vendored code (if used)
+- Go module cache files
+- Generated files (protobuf, mock files, etc.) unless explicitly maintained
+- Third-party code or libraries
 
 For new files created in future years, update the copyright year accordingly.
 
