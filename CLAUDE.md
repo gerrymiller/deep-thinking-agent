@@ -96,18 +96,18 @@ As of latest update, test coverage by package:
 **High Coverage (>80%)**:
 - `internal/config` - 98.1% ✅
 - `pkg/schema` - 96.5% ✅
+- `pkg/llm/openai` - 92.7% ✅ (improved from 41.5%)
 - `pkg/document/chunker` - 91.7% ✅
 - `pkg/agent` - 86.1% ✅
 
 **Moderate Coverage (50-80%)**:
+- `pkg/document/parser` - 77.1% (improved from 35.9%)
 - `pkg/retrieval` - 76.2%
 - `pkg/workflow` - 68.2%
+- `pkg/nodes` - 52.9% (improved from 16.1%)
 
 **Low Coverage (<50%)**:
-- `pkg/llm/openai` - 41.5%
-- `pkg/document/parser` - 35.9%
-- `pkg/embedding` - 35.3%
-- `pkg/nodes` - 16.1%
+- `pkg/embedding` - 45.1% (improved from 35.3%)
 
 **No Tests (0%)**:
 - `cmd/cli` - Requires integration testing framework
@@ -116,12 +116,18 @@ As of latest update, test coverage by package:
 - `pkg/llm` - Interface-only package
 - `pkg/vectorstore` - Interface-only package
 
+**Recent Improvements**:
+- Priority 3 (Test Coverage): Improved 4 packages significantly
+  - `pkg/llm/openai`: 41.5% → 92.7% (+51.2%)
+  - `pkg/document/parser`: 35.9% → 77.1% (+41.2%)
+  - `pkg/nodes`: 16.1% → 52.9% (+36.8%)
+  - `pkg/embedding`: 35.3% → 45.1% (+9.8%)
+
 **Priority for Improvement**:
 1. Add integration test framework for `cmd/` packages
-2. Increase coverage for `pkg/document/parser` (add PDF and HTML parser tests)
-3. Add `pkg/vectorstore/qdrant` tests with test containers
-4. Improve `pkg/nodes` coverage with better mocking
-5. Increase `pkg/embedding` and `pkg/llm/openai` coverage
+2. Add `pkg/vectorstore/qdrant` tests with test containers
+3. Increase `pkg/embedding` coverage to 60%+
+4. Maintain high coverage for all packages (>80% target)
 
 ### Code Quality
 - All code must pass `go fmt`
