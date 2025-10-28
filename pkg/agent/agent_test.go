@@ -33,9 +33,9 @@ func (m *mockLLMProvider) Complete(ctx context.Context, req *llm.CompletionReque
 	}, nil
 }
 
-func (m *mockLLMProvider) Name() string              { return "mock" }
-func (m *mockLLMProvider) ModelName() string        { return "mock-model" }
-func (m *mockLLMProvider) SupportsStreaming() bool  { return false }
+func (m *mockLLMProvider) Name() string            { return "mock" }
+func (m *mockLLMProvider) ModelName() string       { return "mock-model" }
+func (m *mockLLMProvider) SupportsStreaming() bool { return false }
 
 // Mock Embedder
 type mockEmbedder struct {
@@ -72,7 +72,7 @@ func (m *mockEmbedder) Embed(ctx context.Context, req *embedding.EmbedRequest) (
 	}, nil
 }
 
-func (m *mockEmbedder) Dimensions() int  { return 128 }
+func (m *mockEmbedder) Dimensions() int   { return 128 }
 func (m *mockEmbedder) ModelName() string { return "mock-embed" }
 
 // Mock VectorStore
@@ -346,11 +346,11 @@ func TestNewRetriever(t *testing.T) {
 
 func TestRetrieve(t *testing.T) {
 	tests := []struct {
-		name    string
-		store   *mockVectorStore
+		name     string
+		store    *mockVectorStore
 		embedder *mockEmbedder
-		ctx     *workflow.RetrievalContext
-		wantErr bool
+		ctx      *workflow.RetrievalContext
+		wantErr  bool
 	}{
 		{
 			name: "successful retrieval",
@@ -367,11 +367,11 @@ func TestRetrieve(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:    "nil context",
-			store:   &mockVectorStore{},
+			name:     "nil context",
+			store:    &mockVectorStore{},
 			embedder: &mockEmbedder{},
-			ctx:     nil,
-			wantErr: true,
+			ctx:      nil,
+			wantErr:  true,
 		},
 		{
 			name:     "embedder error",
@@ -522,11 +522,11 @@ func TestNewPolicy(t *testing.T) {
 
 func TestDecide(t *testing.T) {
 	tests := []struct {
-		name               string
-		state              *workflow.State
-		response           string
-		expectedContinue   bool
-		wantErr            bool
+		name             string
+		state            *workflow.State
+		response         string
+		expectedContinue bool
+		wantErr          bool
 	}{
 		{
 			name: "plan complete",
@@ -552,7 +552,7 @@ func TestDecide(t *testing.T) {
 			name: "LLM says continue",
 			state: &workflow.State{
 				OriginalQuestion: "test",
-				Plan: &workflow.Plan{Steps: []workflow.PlanStep{{}, {}, {}}},
+				Plan:             &workflow.Plan{Steps: []workflow.PlanStep{{}, {}, {}}},
 				CurrentStepIndex: 1,
 				MaxIterations:    10, // Set max iterations
 			},
@@ -564,7 +564,7 @@ func TestDecide(t *testing.T) {
 			name: "LLM says finish",
 			state: &workflow.State{
 				OriginalQuestion: "test",
-				Plan: &workflow.Plan{Steps: []workflow.PlanStep{{}, {}}},
+				Plan:             &workflow.Plan{Steps: []workflow.PlanStep{{}, {}}},
 				CurrentStepIndex: 1,
 				MaxIterations:    10, // Set max iterations
 			},

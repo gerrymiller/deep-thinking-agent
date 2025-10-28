@@ -60,7 +60,7 @@ func (m *mockEmbedder) Embed(ctx context.Context, req *embedding.EmbedRequest) (
 	}, nil
 }
 
-func (m *mockEmbedder) Dimensions() int  { return 128 }
+func (m *mockEmbedder) Dimensions() int   { return 128 }
 func (m *mockEmbedder) ModelName() string { return "mock-embed" }
 
 // Mock VectorStore
@@ -252,9 +252,9 @@ func TestTokenize(t *testing.T) {
 	retriever := NewKeywordRetriever(&mockVectorStore{})
 
 	tests := []struct {
-		name     string
-		text     string
-		wantMin  int
+		name    string
+		text    string
+		wantMin int
 	}{
 		{
 			name:    "basic tokenization",

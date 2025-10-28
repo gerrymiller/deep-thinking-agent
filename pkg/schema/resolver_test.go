@@ -179,16 +179,16 @@ func TestMatchPattern(t *testing.T) {
 	resolver := NewResolver(provider, nil)
 
 	pattern := &SchemaPattern{
-		Name:        "test",
-		Indicators:  []string{"keyword1", "keyword2", "keyword3"},
-		Priority:    100,
+		Name:       "test",
+		Indicators: []string{"keyword1", "keyword2", "keyword3"},
+		Priority:   100,
 	}
 
 	tests := []struct {
-		name            string
-		content         string
-		expectMatch     bool
-		minConfidence   float32
+		name          string
+		content       string
+		expectMatch   bool
+		minConfidence float32
 	}{
 		{
 			name:          "no match",

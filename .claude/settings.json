@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git merge:*)",
+      "Bash(git pull:*)",
+      "Bash(go test:*)",
+      "Bash(go build:*)",
+      "Bash(go fmt:*)",
+      "Bash(go vet:*)",
+      "Bash(go mod tidy:*)",
+      "Bash(go tool cover:*)",
+      "SlashCommand(/new-feature:*)",
+      "SlashCommand(/bugfix:*)",
+      "SlashCommand(/hotfix:*)",
+      "SlashCommand(/chore:*)",
+      "SlashCommand(/release:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:levelup.gitconnected.com)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

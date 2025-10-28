@@ -71,9 +71,9 @@ func TestChunkDocument(t *testing.T) {
 	content := "This is test content for chunking."
 
 	tests := []struct {
-		name     string
-		schema   *schema.DocumentSchema
-		wantErr  bool
+		name    string
+		schema  *schema.DocumentSchema
+		wantErr bool
 	}{
 		{
 			name: "with section_based strategy",
@@ -111,10 +111,10 @@ func TestChunkDocument(t *testing.T) {
 
 func TestSplitPreservingWords(t *testing.T) {
 	tests := []struct {
-		name     string
-		text     string
-		maxSize  int
-		wantLen  int
+		name    string
+		text    string
+		maxSize int
+		wantLen int
 	}{
 		{
 			name:    "short text no split",
@@ -437,23 +437,23 @@ func TestSlidingWindowChunk(t *testing.T) {
 	chunker := NewSlidingWindowChunker(config)
 
 	tests := []struct {
-		name        string
-		content     string
+		name          string
+		content       string
 		wantMinChunks int
 	}{
 		{
-			name:        "short content single chunk",
-			content:     "Short text",
+			name:          "short content single chunk",
+			content:       "Short text",
 			wantMinChunks: 1,
 		},
 		{
-			name:        "long content multiple chunks",
-			content:     strings.Repeat("a", 500),
+			name:          "long content multiple chunks",
+			content:       strings.Repeat("a", 500),
 			wantMinChunks: 4,
 		},
 		{
-			name:        "content with sentences",
-			content:     strings.Repeat("This is a sentence. ", 50),
+			name:          "content with sentences",
+			content:       strings.Repeat("This is a sentence. ", 50),
 			wantMinChunks: 5,
 		},
 	}

@@ -48,11 +48,11 @@ func TestBuildChunkMetadata(t *testing.T) {
 		},
 		SemanticRegions: []SemanticRegion{
 			{
-				ID:          "reg1",
-				Type:        "problem_statement",
-				Keywords:    []string{"problem", "issue"},
-				Boundaries:  []Boundary{{StartPos: 0, EndPos: 50}},
-				Confidence:  0.9,
+				ID:         "reg1",
+				Type:       "problem_statement",
+				Keywords:   []string{"problem", "issue"},
+				Boundaries: []Boundary{{StartPos: 0, EndPos: 50}},
+				Confidence: 0.9,
 			},
 		},
 		CustomAttributes: map[string]interface{}{
@@ -164,11 +164,11 @@ func TestFindContainingSection(t *testing.T) {
 	builder := NewMetadataBuilder(schema)
 
 	tests := []struct {
-		name       string
-		startPos   int
-		endPos     int
-		wantSecID  string
-		wantNil    bool
+		name      string
+		startPos  int
+		endPos    int
+		wantSecID string
+		wantNil   bool
 	}{
 		{
 			name:      "fully contained in section",

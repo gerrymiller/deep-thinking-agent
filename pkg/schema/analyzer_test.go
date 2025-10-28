@@ -17,11 +17,11 @@ import (
 
 // MockLLMProvider for testing
 type mockLLMProvider struct {
-	response     string
-	err          error
-	callCount    int
-	lastRequest  *llm.CompletionRequest
-	shouldDelay  time.Duration
+	response    string
+	err         error
+	callCount   int
+	lastRequest *llm.CompletionRequest
+	shouldDelay time.Duration
 }
 
 func (m *mockLLMProvider) Complete(ctx context.Context, req *llm.CompletionRequest) (*llm.CompletionResponse, error) {
@@ -381,16 +381,16 @@ func TestBuildHierarchy(t *testing.T) {
 	analyzer := NewAnalyzer(&mockLLMProvider{}, nil)
 
 	tests := []struct {
-		name         string
-		sections     []Section
-		expectDepth  int
-		expectRoots  int
+		name        string
+		sections    []Section
+		expectDepth int
+		expectRoots int
 	}{
 		{
-			name:         "empty sections",
-			sections:     []Section{},
-			expectDepth:  0,
-			expectRoots:  0,
+			name:        "empty sections",
+			sections:    []Section{},
+			expectDepth: 0,
+			expectRoots: 0,
 		},
 		{
 			name: "single level sections",
