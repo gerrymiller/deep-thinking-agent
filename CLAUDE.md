@@ -143,6 +143,15 @@ As of latest update, test coverage by package:
 - Include inline comments for complex logic
 - Write clear commit messages following conventional commits style
 
+### Attribution
+**CRITICAL**: All work in this repository is authored by Gerry Miller.
+
+- **NEVER** attribute anything to "Claude Code" or any AI assistant
+- **NEVER** add "Co-Authored-By: Claude" or similar to commits
+- **NEVER** add footers like "🤖 Generated with [Claude Code]" to commits
+- All code, documentation, and commits are authored by Gerry Miller
+- AI assistants are tools that help execute the author's vision, not co-authors
+
 ## Git Workflow
 
 This project follows a gitflow branching strategy:
@@ -163,14 +172,15 @@ This project follows a gitflow branching strategy:
     - Example: `release/v1.0.0`
     - Must merge to both `main` AND `develop`
 
+**Note**: This repository currently has no remote configured. All work is local-only. Commands like `git push` and `git pull` are not needed until a remote repository is added.
+
 ### Creating Branches
 
 Use the custom slash commands (see [Claude Code Custom Commands](#claude-code-custom-commands)) or manually:
 
 ```bash
-# Ensure you're on develop and up to date
+# Ensure you're on develop
 git checkout develop
-git pull origin develop
 
 # Create and checkout a new branch
 git checkout -b <branch-type>/<description>
@@ -183,16 +193,19 @@ go test ./...
 go fmt ./...
 go vet ./...
 
-# Commit and push
+# Commit changes
 git add .
 git commit -m "Description of changes"
-git push origin <branch-name>
 
-# Merge back to develop (after review if needed)
+# Merge back to develop
 git checkout develop
 git merge <branch-name>
-git push origin develop
 ```
+
+**When a remote repository is added later**, update the workflow to include:
+- `git pull origin develop` before creating branches
+- `git push origin <branch-name>` after committing
+- `git push origin develop` after merging
 
 ## Development Commands
 
