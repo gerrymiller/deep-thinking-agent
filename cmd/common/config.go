@@ -87,12 +87,12 @@ func DefaultConfig() *Config {
 		LLM: LLMConfig{
 			ReasoningLLM: LLMProviderConfig{
 				Provider:           "openai",
-				Model:              "gpt-4",
+				Model:              "gpt-4o", // Latest: gpt-4o (May 2024), supports vision
 				DefaultTemperature: 0.7,
 			},
 			FastLLM: LLMProviderConfig{
 				Provider:           "openai",
-				Model:              "gpt-3.5-turbo",
+				Model:              "gpt-4o-mini", // Replaces deprecated gpt-3.5-turbo (July 2024)
 				DefaultTemperature: 0.5,
 			},
 		},

@@ -26,11 +26,11 @@ func TestLoadFromFile(t *testing.T) {
 				"llm": {
 					"reasoning_llm": {
 						"provider": "openai",
-						"model": "gpt-4"
+						"model": "gpt-4o"
 					},
 					"fast_llm": {
 						"provider": "openai",
-						"model": "gpt-3.5-turbo"
+						"model": "gpt-4o-mini"
 					}
 				},
 				"embedding": {
@@ -201,10 +201,10 @@ func TestLoadFromEnv(t *testing.T) {
 				if c.LLM.ReasoningLLM.Provider != "openai" {
 					t.Errorf("expected default provider openai, got %s", c.LLM.ReasoningLLM.Provider)
 				}
-				if c.LLM.ReasoningLLM.Model != "gpt-4" {
+				if c.LLM.ReasoningLLM.Model != "gpt-4o" {
 					t.Errorf("expected default model gpt-4, got %s", c.LLM.ReasoningLLM.Model)
 				}
-				if c.LLM.FastLLM.Model != "gpt-3.5-turbo" {
+				if c.LLM.FastLLM.Model != "gpt-4o-mini" {
 					t.Errorf("expected default fast model gpt-3.5-turbo, got %s", c.LLM.FastLLM.Model)
 				}
 				if c.Embedding.Model != "text-embedding-3-small" {
@@ -303,14 +303,14 @@ func TestSaveToFile(t *testing.T) {
 		LLM: LLMConfig{
 			ReasoningLLM: LLMProviderConfig{
 				Provider:           "openai",
-				Model:              "gpt-4",
+				Model:              "gpt-4o",
 				DefaultTemperature: 0.7,
 				DefaultMaxTokens:   2048,
 				TimeoutSeconds:     60,
 			},
 			FastLLM: LLMProviderConfig{
 				Provider:           "openai",
-				Model:              "gpt-3.5-turbo",
+				Model:              "gpt-4o-mini",
 				DefaultTemperature: 0.5,
 				DefaultMaxTokens:   1024,
 				TimeoutSeconds:     30,
@@ -387,7 +387,7 @@ func TestToLLMConfig(t *testing.T) {
 				Provider:           "openai",
 				APIKey:             "test-key",
 				BaseURL:            "https://api.openai.com",
-				Model:              "gpt-4",
+				Model:              "gpt-4o",
 				DefaultTemperature: 0.8,
 				DefaultMaxTokens:   3000,
 				TimeoutSeconds:     90,
@@ -403,7 +403,7 @@ func TestToLLMConfig(t *testing.T) {
 	if llmConfig.APIKey != "test-key" {
 		t.Errorf("expected API key test-key, got %s", llmConfig.APIKey)
 	}
-	if llmConfig.Model != "gpt-4" {
+	if llmConfig.Model != "gpt-4o" {
 		t.Errorf("expected model gpt-4, got %s", llmConfig.Model)
 	}
 	if llmConfig.DefaultTemperature != 0.8 {

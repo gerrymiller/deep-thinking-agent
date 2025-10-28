@@ -195,12 +195,12 @@ The system supports multiple document formats:
 {
   "reasoning_llm": {
     "provider": "openai",
-    "model": "gpt-4",              // Use "gpt-4" for best results
+    "model": "gpt-4o",              // Use "gpt-4o" for best results
     "default_temperature": 0.7      // Higher = more creative
   },
   "fast_llm": {
     "provider": "openai",
-    "model": "gpt-3.5-turbo",      // Faster, cheaper for simple tasks
+    "model": "gpt-4o-mini",      // Faster, cheaper for simple tasks
     "default_temperature": 0.5
   }
 }
@@ -220,7 +220,7 @@ The system supports multiple document formats:
 
 ## Performance Tips
 
-1. **Use appropriate models**: gpt-4 for complex reasoning, gpt-3.5-turbo for simple tasks
+1. **Use appropriate models**: gpt-4o for complex reasoning, gpt-4o-mini for simple tasks
 2. **Adjust max_iterations**: Lower for simple queries (faster), higher for complex reasoning
 3. **Tune retrieval parameters**: Increase top_k_retrieval for better recall
 4. **Batch ingestion**: Use `-recursive` flag to ingest multiple documents at once

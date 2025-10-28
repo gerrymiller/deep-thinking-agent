@@ -128,7 +128,7 @@ func LoadFromEnv() *Config {
 			ReasoningLLM: LLMProviderConfig{
 				Provider:           getEnv("REASONING_LLM_PROVIDER", "openai"),
 				APIKey:             getEnv("REASONING_LLM_API_KEY", ""),
-				Model:              getEnv("REASONING_LLM_MODEL", "gpt-4"),
+				Model:              getEnv("REASONING_LLM_MODEL", "gpt-4o"), // Latest: gpt-4o (May 2024), supports vision. Alternative: gpt-5 when available
 				DefaultTemperature: 0.7,
 				DefaultMaxTokens:   2048,
 				TimeoutSeconds:     60,
@@ -136,7 +136,7 @@ func LoadFromEnv() *Config {
 			FastLLM: LLMProviderConfig{
 				Provider:           getEnv("FAST_LLM_PROVIDER", "openai"),
 				APIKey:             getEnv("FAST_LLM_API_KEY", ""),
-				Model:              getEnv("FAST_LLM_MODEL", "gpt-3.5-turbo"),
+				Model:              getEnv("FAST_LLM_MODEL", "gpt-4o-mini"), // Replaces deprecated gpt-3.5-turbo (July 2024)
 				DefaultTemperature: 0.5,
 				DefaultMaxTokens:   1024,
 				TimeoutSeconds:     30,
