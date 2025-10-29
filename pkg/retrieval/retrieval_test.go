@@ -231,21 +231,75 @@ func TestNewKeywordRetriever(t *testing.T) {
 }
 
 func TestKeywordSearch(t *testing.T) {
-	// NOTE: Keyword search is simplified for Phase 3
-	// It returns empty results as it requires an inverted index
-
-	store := &mockVectorStore{}
+	// Create mock store with sample documents
+	store := &mockVectorStore{
+		searchResults: []vectorstore.Document{
+			{
+				ID:      "doc1",
+				Content: "Machine learning algorithms are used for pattern recognition and data analysis",
+			},
+			{
+				ID:      "doc2",
+				Content: "Deep learning networks use neural architectures for complex tasks",
+			},
+			{
+				ID:      "doc3",
+				Content: "Natural language processing enables computers to understand human language",
+			},
+		},
+	}
 	retriever := NewKeywordRetriever(store)
 
-	results, err := retriever.Search(context.Background(), "test query", 10, nil)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	t.Run("finds relevant documents", func(t *testing.T) {
+		results, err := retriever.Search(context.Background(), "machine learning algorithms", 2, nil)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
 
-	// Should return empty results for Phase 3
-	if len(results) != 0 {
-		t.Errorf("expected 0 results for simplified implementation, got %d", len(results))
-	}
+		// Should find documents containing query terms
+		if len(results) == 0 {
+			t.Error("expected at least some results for keyword search")
+		}
+
+		// First result should have highest BM25 score
+		if len(results) > 1 && results[0].Score < results[1].Score {
+			t.Error("results should be sorted by score descending")
+		}
+	})
+
+	t.Run("empty query returns empty results", func(t *testing.T) {
+		results, err := retriever.Search(context.Background(), "", 10, nil)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if len(results) != 0 {
+			t.Errorf("expected 0 results for empty query, got %d", len(results))
+		}
+	})
+
+	t.Run("no matching documents", func(t *testing.T) {
+		results, err := retriever.Search(context.Background(), "quantum physics", 10, nil)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		// Should return empty results when no documents match
+		if len(results) != 0 {
+			t.Errorf("expected 0 results for non-matching query, got %d", len(results))
+		}
+	})
+
+	t.Run("respects topK limit", func(t *testing.T) {
+		results, err := retriever.Search(context.Background(), "learning", 1, nil)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if len(results) > 1 {
+			t.Errorf("expected at most 1 result, got %d", len(results))
+		}
+	})
 }
 
 func TestTokenize(t *testing.T) {

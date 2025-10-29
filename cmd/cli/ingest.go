@@ -21,7 +21,8 @@ func runIngest(args []string) error {
 	configPath := fs.String("config", "config.json", "Path to configuration file")
 	recursive := fs.Bool("recursive", false, "Recursively process directories")
 	collection := fs.String("collection", "documents", "Target collection name")
-	deriveSchema := fs.Bool("derive-schema", true, "Derive document schema using LLM")
+	deriveSchema := fs.Bool("derive-schema", true, "Derive document schema using LLM (default true)")
+	noSchema := fs.Bool("no-schema", false, "Skip schema derivation, use simple chunking")
 	verbose := fs.Bool("verbose", false, "Show detailed processing information")
 
 	fs.Usage = func() {
@@ -38,14 +39,19 @@ Options:
         Target collection name (default "documents")
   -derive-schema
         Derive document schema using LLM (default true)
+  -no-schema
+        Skip schema derivation, use simple paragraph-based chunking
   -verbose
         Show detailed processing information
 
 Examples:
-  # Ingest a single file
+  # Ingest with schema analysis (default)
   deep-thinking-agent ingest document.txt
 
-  # Ingest a directory
+  # Ingest without schema analysis (faster)
+  deep-thinking-agent ingest -no-schema document.txt
+
+  # Ingest a directory recursively
   deep-thinking-agent ingest -recursive ./documents
 
   # Ingest with custom collection
@@ -78,8 +84,10 @@ Examples:
 
 	// Process each path
 	var totalFiles, totalChunks int
+	// If -no-schema is set, override -derive-schema
+	useSchema := *deriveSchema && !*noSchema
 	for _, path := range fs.Args() {
-		files, chunks, err := processPath(ctx, system, path, *recursive, *collection, *deriveSchema, *verbose)
+		files, chunks, err := processPath(ctx, system, path, *recursive, *collection, useSchema, *verbose)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Warning: failed to process %s: %v\n", path, err)
 			continue

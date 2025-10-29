@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"deep-thinking-agent/pkg/agent"
+	"deep-thinking-agent/pkg/document/chunker"
 	"deep-thinking-agent/pkg/embedding"
 	"deep-thinking-agent/pkg/llm"
 	"deep-thinking-agent/pkg/llm/openai"
@@ -234,13 +235,56 @@ func (s *System) initWorkflow() error {
 }
 
 // IngestDocument processes and ingests a document into the vector store.
-// TODO: Complete implementation with full schema analysis and chunking
+// If deriveSchema is true, uses schema-aware chunking; otherwise uses simple paragraph chunking.
 func (s *System) IngestDocument(ctx context.Context, docID string, content string, deriveSchema bool) (int, error) {
-	// For now, implement basic ingestion without schema analysis
-	// This will be completed when all component APIs are finalized
+	var chunks []string
+	var chunkMetadata []map[string]interface{}
 
-	// Simple chunking: split by paragraphs
-	chunks := splitIntoChunks(content, 512)
+	if deriveSchema && s.SchemaResolver != nil {
+		// Use schema-aware chunking
+		resolutionResult, err := s.SchemaResolver.Resolve(ctx, docID, content, "text/plain", nil)
+		if err != nil {
+			// Fall back to simple chunking if schema resolution fails
+			chunks = splitIntoChunks(content, 512)
+			chunkMetadata = make([]map[string]interface{}, len(chunks))
+			for i := range chunks {
+				chunkMetadata[i] = map[string]interface{}{"doc_id": docID}
+			}
+		} else {
+			// Use schema-aware chunker
+			chunkerConfig := chunker.DefaultConfig()
+			chunkResults, err := chunker.ChunkDocument(content, resolutionResult.Schema, chunkerConfig)
+			if err != nil {
+				// Fall back to simple chunking
+				chunks = splitIntoChunks(content, 512)
+				chunkMetadata = make([]map[string]interface{}, len(chunks))
+				for i := range chunks {
+					chunkMetadata[i] = map[string]interface{}{"doc_id": docID}
+				}
+			} else {
+				// Extract chunks and their metadata
+				chunks = make([]string, len(chunkResults))
+				chunkMetadata = make([]map[string]interface{}, len(chunkResults))
+				for i, chunkResult := range chunkResults {
+					chunks[i] = chunkResult.Text
+					metadata := map[string]interface{}{"doc_id": docID}
+					if chunkResult.Metadata != nil {
+						metadata["section_id"] = chunkResult.Metadata.SectionID
+						metadata["section_type"] = chunkResult.Metadata.SectionType
+						metadata["hierarchy"] = chunkResult.Metadata.HierarchyPath
+					}
+					chunkMetadata[i] = metadata
+				}
+			}
+		}
+	} else {
+		// Simple chunking: split by paragraphs
+		chunks = splitIntoChunks(content, 512)
+		chunkMetadata = make([]map[string]interface{}, len(chunks))
+		for i := range chunks {
+			chunkMetadata[i] = map[string]interface{}{"doc_id": docID}
+		}
+	}
 
 	// Generate embeddings
 	embedResp, err := s.Embedder.Embed(ctx, &embedding.EmbedRequest{
@@ -257,7 +301,7 @@ func (s *System) IngestDocument(ctx context.Context, docID string, content strin
 			ID:        fmt.Sprintf("%s_chunk_%d", docID, i),
 			Content:   chunk,
 			Embedding: embedResp.Vectors[i].Embedding,
-			Metadata:  map[string]interface{}{"doc_id": docID},
+			Metadata:  chunkMetadata[i],
 		}
 	}
 
