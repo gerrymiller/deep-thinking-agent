@@ -630,3 +630,163 @@ func TestBuildContextFromPastSteps(t *testing.T) {
 		t.Error("context missing question 1")
 	}
 }
+
+func TestRerankWithScores(t *testing.T) {
+	reranker := NewReranker(&RerankerConfig{TopN: 2})
+
+	docs := []vectorstore.Document{
+		{ID: "doc1", Content: "content 1", Score: 0.5},
+		{ID: "doc2", Content: "content 2", Score: 0.9},
+		{ID: "doc3", Content: "content 3", Score: 0.7},
+	}
+
+	reranked := reranker.RerankWithScores(context.Background(), "test query", docs)
+
+	if len(reranked) != 2 {
+		t.Errorf("expected 2 documents, got %d", len(reranked))
+	}
+
+	// Should return top 2 by score
+	if reranked[0].ID != "doc2" {
+		t.Errorf("expected doc2 first, got %s", reranked[0].ID)
+	}
+}
+
+func TestBuildMetadataFilters(t *testing.T) {
+	retriever := NewRetriever(&mockVectorStore{}, &mockEmbedder{}, nil)
+
+	tests := []struct {
+		name     string
+		filters  *workflow.SchemaFilters
+		expected map[string]interface{}
+	}{
+		{
+			name:     "nil filters",
+			filters:  nil,
+			expected: nil,
+		},
+		{
+			name: "document IDs only",
+			filters: &workflow.SchemaFilters{
+				DocumentIDs: []string{"doc1", "doc2"},
+			},
+			expected: map[string]interface{}{
+				"doc_id": []string{"doc1", "doc2"},
+			},
+		},
+		{
+			name: "section types only",
+			filters: &workflow.SchemaFilters{
+				SectionTypes: []string{"methodology", "results"},
+			},
+			expected: map[string]interface{}{
+				"section_type": []string{"methodology", "results"},
+			},
+		},
+		{
+			name: "semantic tags only",
+			filters: &workflow.SchemaFilters{
+				SemanticTags: []string{"important", "key-finding"},
+			},
+			expected: map[string]interface{}{
+				"semantic_tags": []string{"important", "key-finding"},
+			},
+		},
+		{
+			name: "custom attributes only",
+			filters: &workflow.SchemaFilters{
+				CustomAttributes: map[string]interface{}{
+					"year":   2025,
+					"author": "Smith",
+				},
+			},
+			expected: map[string]interface{}{
+				"year":   2025,
+				"author": "Smith",
+			},
+		},
+		{
+			name: "all filters combined",
+			filters: &workflow.SchemaFilters{
+				DocumentIDs:  []string{"doc1"},
+				SectionTypes: []string{"abstract"},
+				SemanticTags: []string{"summary"},
+				CustomAttributes: map[string]interface{}{
+					"lang": "en",
+				},
+			},
+			expected: map[string]interface{}{
+				"doc_id":        []string{"doc1"},
+				"section_type":  []string{"abstract"},
+				"semantic_tags": []string{"summary"},
+				"lang":          "en",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := retriever.buildMetadataFilters(tt.filters)
+
+			if tt.expected == nil {
+				if result != nil {
+					t.Errorf("expected nil, got %v", result)
+				}
+				return
+			}
+
+			if result == nil {
+				t.Fatal("expected non-nil result")
+			}
+
+			if len(result) != len(tt.expected) {
+				t.Errorf("expected %d filters, got %d", len(tt.expected), len(result))
+			}
+
+			for key := range tt.expected {
+				if result[key] == nil {
+					t.Errorf("missing key %s", key)
+				}
+			}
+
+			// Verify all keys from result exist in expected
+			for key := range result {
+				if tt.expected[key] == nil {
+					t.Errorf("unexpected key %s in result", key)
+				}
+			}
+		})
+	}
+}
+
+func TestBuildStrategyPrompt(t *testing.T) {
+	supervisor := NewSupervisor(&mockLLMProvider{}, nil)
+
+	state := &workflow.State{
+		OriginalQuestion: "What is the capital of France?",
+		PastSteps: []workflow.PastStep{
+			{Step: workflow.PlanStep{SubQuestion: "Q1"}, Summary: "S1"},
+		},
+	}
+
+	prompt := supervisor.buildStrategyPrompt("test query", state)
+
+	if prompt == "" {
+		t.Error("prompt should not be empty")
+	}
+
+	if !strings.Contains(prompt, "test query") {
+		t.Error("prompt should contain the query")
+	}
+
+	// Verify prompt contains strategy options
+	if !strings.Contains(prompt, "vector") {
+		t.Error("prompt should contain 'vector' strategy")
+	}
+	if !strings.Contains(prompt, "keyword") {
+		t.Error("prompt should contain 'keyword' strategy")
+	}
+	if !strings.Contains(prompt, "hybrid") {
+		t.Error("prompt should contain 'hybrid' strategy")
+	}
+}

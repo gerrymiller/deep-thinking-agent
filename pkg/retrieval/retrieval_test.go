@@ -505,3 +505,95 @@ func TestSearchWithFilters(t *testing.T) {
 		t.Error("no results returned")
 	}
 }
+
+func TestCalculateAvgDocLength(t *testing.T) {
+	store := &mockVectorStore{}
+	retriever := NewKeywordRetriever(store)
+
+	t.Run("empty documents", func(t *testing.T) {
+		docs := []vectorstore.Document{}
+		avg := retriever.calculateAvgDocLength(docs)
+
+		if avg != 0 {
+			t.Errorf("expected 0 for empty docs, got %f", avg)
+		}
+	})
+
+	t.Run("single document", func(t *testing.T) {
+		docs := []vectorstore.Document{
+			{Content: "hello world test"},
+		}
+		avg := retriever.calculateAvgDocLength(docs)
+
+		if avg != 3.0 {
+			t.Errorf("expected 3.0, got %f", avg)
+		}
+	})
+
+	t.Run("multiple documents", func(t *testing.T) {
+		docs := []vectorstore.Document{
+			{Content: "hello world"},       // 2 tokens
+			{Content: "test document here"}, // 3 tokens
+			{Content: "one"},                // 1 token
+		}
+		avg := retriever.calculateAvgDocLength(docs)
+
+		expected := 2.0 // (2+3+1)/3
+		if avg != expected {
+			t.Errorf("expected %f, got %f", expected, avg)
+		}
+	})
+}
+
+func TestScoreBM25(t *testing.T) {
+	store := &mockVectorStore{}
+	retriever := NewKeywordRetriever(store)
+
+	t.Run("document with matching terms", func(t *testing.T) {
+		queryTerms := []string{"test", "document"}
+		doc := vectorstore.Document{
+			Content: "this is a test document with some test content",
+		}
+		avgDocLen := 5.0
+		corpusSize := 10
+
+		score := retriever.scoreBM25(queryTerms, doc, avgDocLen, corpusSize)
+
+		// Score should be positive since there are matching terms
+		if score <= 0 {
+			t.Errorf("expected positive score, got %f", score)
+		}
+	})
+
+	t.Run("document with no matching terms", func(t *testing.T) {
+		queryTerms := []string{"nonexistent", "terms"}
+		doc := vectorstore.Document{
+			Content: "this is a test document",
+		}
+		avgDocLen := 5.0
+		corpusSize := 10
+
+		score := retriever.scoreBM25(queryTerms, doc, avgDocLen, corpusSize)
+
+		// Score should be 0 since no matching terms
+		if score != 0 {
+			t.Errorf("expected 0 score, got %f", score)
+		}
+	})
+
+	t.Run("document with partial matches", func(t *testing.T) {
+		queryTerms := []string{"test", "nonexistent"}
+		doc := vectorstore.Document{
+			Content: "this is a test document",
+		}
+		avgDocLen := 5.0
+		corpusSize := 10
+
+		score := retriever.scoreBM25(queryTerms, doc, avgDocLen, corpusSize)
+
+		// Score should be positive but less than full match
+		if score <= 0 {
+			t.Errorf("expected positive score for partial match, got %f", score)
+		}
+	})
+}

@@ -162,3 +162,37 @@ More text.
 		t.Errorf("Expected 1 image, got %d", metadata["image_count"])
 	}
 }
+
+func TestMarkdownParser_EdgeCases(t *testing.T) {
+	parser := NewMarkdownParser()
+
+	t.Run("markdown with only whitespace", func(t *testing.T) {
+		content := "   \n\t\n  \n"
+		reader := strings.NewReader(content)
+		doc, err := parser.Parse(reader, "whitespace.md")
+
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if doc.Title != "" {
+			t.Errorf("expected empty title, got %q", doc.Title)
+		}
+	})
+
+	t.Run("markdown with long heading", func(t *testing.T) {
+		longTitle := strings.Repeat("A", 250)
+		content := "# " + longTitle + "\n\nContent here."
+		reader := strings.NewReader(content)
+		doc, err := parser.Parse(reader, "long.md")
+
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		// Should extract the title even if long
+		if !strings.Contains(doc.Title, "A") {
+			t.Error("expected title to be extracted")
+		}
+	})
+}
