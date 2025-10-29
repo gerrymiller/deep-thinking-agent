@@ -439,6 +439,219 @@ func TestExecutor_Execute(t *testing.T) {
 			t.Errorf("FinalAnswer = %v, want 'step1 step2'", result.FinalAnswer)
 		}
 	})
+
+	t.Run("node returns nil result", func(t *testing.T) {
+		graph := workflow.NewGraph()
+		node := &mockNode{
+			name: "bad_node",
+			executeFunc: func(state *workflow.State) (*workflow.NodeResult, error) {
+				return nil, nil // nil result
+			},
+		}
+		graph.AddNode(node)
+		graph.SetStart("bad_node")
+
+		executor := workflow.NewExecutor(graph, nil)
+		state := workflow.NewState("test")
+		_, err := executor.Execute(ctx, state)
+		if err == nil {
+			t.Error("Execute should error when node returns nil result")
+		}
+	})
+
+	t.Run("node returns nil state", func(t *testing.T) {
+		graph := workflow.NewGraph()
+		node := &mockNode{
+			name: "bad_node",
+			executeFunc: func(state *workflow.State) (*workflow.NodeResult, error) {
+				return &workflow.NodeResult{UpdatedState: nil}, nil
+			},
+		}
+		graph.AddNode(node)
+		graph.SetStart("bad_node")
+
+		executor := workflow.NewExecutor(graph, nil)
+		state := workflow.NewState("test")
+		_, err := executor.Execute(ctx, state)
+		if err == nil {
+			t.Error("Execute should error when node returns nil state")
+		}
+	})
+
+	t.Run("state contains error", func(t *testing.T) {
+		graph := workflow.NewGraph()
+		node := &mockNode{
+			name: "error_node",
+			executeFunc: func(state *workflow.State) (*workflow.NodeResult, error) {
+				state.Error = errors.New("state error")
+				return &workflow.NodeResult{UpdatedState: state}, nil
+			},
+		}
+		graph.AddNode(node)
+		graph.SetStart("error_node")
+
+		executor := workflow.NewExecutor(graph, nil)
+		state := workflow.NewState("test")
+		result, err := executor.Execute(ctx, state)
+		if err == nil {
+			t.Error("Execute should error when state contains error")
+		}
+		if result == nil {
+			t.Error("Execute should return state even on error")
+		}
+	})
+
+	t.Run("plan complete workflow exits", func(t *testing.T) {
+		graph := workflow.NewGraph()
+		callCount := 0
+
+		planner := &mockNode{
+			name: "planner",
+			executeFunc: func(state *workflow.State) (*workflow.NodeResult, error) {
+				callCount++
+				state.Plan = &workflow.Plan{
+					Steps: []workflow.PlanStep{{Index: 0, SubQuestion: "q1"}},
+				}
+				return &workflow.NodeResult{UpdatedState: state}, nil
+			},
+		}
+		rewriter := &mockNode{
+			name: "rewriter",
+			executeFunc: func(state *workflow.State) (*workflow.NodeResult, error) {
+				callCount++
+				state.IncrementStep() // Move past last step
+				return &workflow.NodeResult{UpdatedState: state}, nil
+			},
+		}
+
+		graph.AddNode(planner)
+		graph.AddNode(rewriter)
+		graph.AddEdge("planner", "rewriter")
+		graph.SetStart("planner")
+
+		executor := workflow.NewExecutor(graph, nil)
+		state := workflow.NewState("test")
+		_, err := executor.Execute(ctx, state)
+		if err != nil {
+			t.Errorf("Execute() error = %v", err)
+		}
+		// Should execute planner once and rewriter once, then exit
+		if callCount != 2 {
+			t.Errorf("expected 2 executions, got %d", callCount)
+		}
+	})
+
+	t.Run("explicit next node", func(t *testing.T) {
+		graph := workflow.NewGraph()
+		executionOrder := []string{}
+
+		node1 := &mockNode{
+			name: "node1",
+			executeFunc: func(state *workflow.State) (*workflow.NodeResult, error) {
+				executionOrder = append(executionOrder, "node1")
+				// Explicitly go to node3, skipping node2
+				return &workflow.NodeResult{UpdatedState: state, NextNode: "node3"}, nil
+			},
+		}
+		node2 := &mockNode{
+			name: "node2",
+			executeFunc: func(state *workflow.State) (*workflow.NodeResult, error) {
+				executionOrder = append(executionOrder, "node2")
+				return &workflow.NodeResult{UpdatedState: state}, nil
+			},
+		}
+		node3 := &mockNode{
+			name: "node3",
+			executeFunc: func(state *workflow.State) (*workflow.NodeResult, error) {
+				executionOrder = append(executionOrder, "node3")
+				return &workflow.NodeResult{UpdatedState: state}, nil
+			},
+		}
+
+		graph.AddNode(node1)
+		graph.AddNode(node2)
+		graph.AddNode(node3)
+		graph.AddEdge("node1", "node2")
+		graph.AddEdge("node2", "node3")
+		graph.SetStart("node1")
+
+		executor := workflow.NewExecutor(graph, nil)
+		state := workflow.NewState("test")
+		_, err := executor.Execute(ctx, state)
+		if err != nil {
+			t.Errorf("Execute() error = %v", err)
+		}
+
+		// Should execute node1 then node3, skipping node2
+		if len(executionOrder) != 2 {
+			t.Errorf("expected 2 executions, got %d", len(executionOrder))
+		}
+		if executionOrder[0] != "node1" || executionOrder[1] != "node3" {
+			t.Errorf("expected [node1, node3], got %v", executionOrder)
+		}
+	})
+
+	t.Run("explicit next node to finish", func(t *testing.T) {
+		graph := workflow.NewGraph()
+		callCount := 0
+
+		node := &mockNode{
+			name: "node1",
+			executeFunc: func(state *workflow.State) (*workflow.NodeResult, error) {
+				callCount++
+				// Explicitly go to "finish"
+				return &workflow.NodeResult{UpdatedState: state, NextNode: "finish"}, nil
+			},
+		}
+
+		graph.AddNode(node)
+		graph.SetStart("node1")
+
+		executor := workflow.NewExecutor(graph, nil)
+		state := workflow.NewState("test")
+		_, err := executor.Execute(ctx, state)
+		if err != nil {
+			t.Errorf("Execute() error = %v", err)
+		}
+
+		// Should execute once then finish
+		if callCount != 1 {
+			t.Errorf("expected 1 execution, got %d", callCount)
+		}
+	})
+
+	t.Run("max iterations via state", func(t *testing.T) {
+		graph := workflow.NewGraph()
+		callCount := 0
+
+		node := &mockNode{
+			name: "loop",
+			executeFunc: func(state *workflow.State) (*workflow.NodeResult, error) {
+				callCount++
+				// Add a past step each iteration
+				state.AddPastStep(workflow.PastStep{Summary: "step"})
+				// Loop back to self
+				return &workflow.NodeResult{UpdatedState: state, NextNode: "loop"}, nil
+			},
+		}
+
+		graph.AddNode(node)
+		graph.SetStart("loop")
+
+		executor := workflow.NewExecutor(graph, nil)
+		state := workflow.NewState("test")
+		state.MaxIterations = 5 // Set low limit
+
+		_, err := executor.Execute(ctx, state)
+		if err != nil {
+			t.Errorf("Execute() error = %v", err)
+		}
+
+		// Should execute until MaxIterations is reached
+		if callCount != 5 {
+			t.Errorf("expected 5 executions, got %d", callCount)
+		}
+	})
 }
 
 func TestExecutor_ExecuteStep(t *testing.T) {
@@ -478,6 +691,24 @@ func TestExecutor_ExecuteStep(t *testing.T) {
 		_, err := executor.ExecuteStep(ctx, state, "nonexistent")
 		if err == nil {
 			t.Error("ExecuteStep should error on nonexistent node")
+		}
+	})
+
+	t.Run("node execution error", func(t *testing.T) {
+		graph := workflow.NewGraph()
+		node := &mockNode{
+			name: "error_node",
+			executeFunc: func(state *workflow.State) (*workflow.NodeResult, error) {
+				return nil, errors.New("execution failed")
+			},
+		}
+		graph.AddNode(node)
+
+		executor := workflow.NewExecutor(graph, nil)
+		state := workflow.NewState("test question")
+		_, err := executor.ExecuteStep(ctx, state, "error_node")
+		if err == nil {
+			t.Error("ExecuteStep should propagate node execution error")
 		}
 	})
 }
@@ -626,4 +857,254 @@ func TestState_GetRetrievalContext(t *testing.T) {
 	if ctx.RerankerTopN != 3 {
 		t.Errorf("RerankerTopN = %v, want 3", ctx.RerankerTopN)
 	}
+
+}
+
+
+// TestExecutor_RouteNext tests the routeNext logic indirectly through Execute
+func TestExecutor_RouteNext(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("should continue false stops execution", func(t *testing.T) {
+		graph := workflow.NewGraph()
+		callCount := 0
+
+		// Create a node that sets ShouldContinue to false
+		node1 := &mockNode{
+			name: "node1",
+			executeFunc: func(state *workflow.State) (*workflow.NodeResult, error) {
+				callCount++
+				state.ShouldContinue = false
+				return &workflow.NodeResult{UpdatedState: state}, nil
+			},
+		}
+		node2 := &mockNode{
+			name: "node2",
+			executeFunc: func(state *workflow.State) (*workflow.NodeResult, error) {
+				callCount++
+				return &workflow.NodeResult{UpdatedState: state}, nil
+			},
+		}
+
+		graph.AddNode(node1)
+		graph.AddNode(node2)
+		graph.AddEdge("node1", "node2")
+		graph.SetStart("node1")
+
+		executor := workflow.NewExecutor(graph, nil)
+		state := workflow.NewState("test")
+		_, err := executor.Execute(ctx, state)
+
+		if err != nil {
+			t.Errorf("Execute() error = %v", err)
+		}
+		// Should execute only node1, not node2
+		if callCount != 1 {
+			t.Errorf("expected 1 node execution, got %d", callCount)
+		}
+	})
+
+	t.Run("multiple next nodes selects first", func(t *testing.T) {
+		graph := workflow.NewGraph()
+		selectedNode := ""
+
+		node1 := &mockNode{
+			name: "node1",
+			executeFunc: func(state *workflow.State) (*workflow.NodeResult, error) {
+				return &workflow.NodeResult{UpdatedState: state}, nil
+			},
+		}
+		node2 := &mockNode{
+			name: "option1",
+			executeFunc: func(state *workflow.State) (*workflow.NodeResult, error) {
+				selectedNode = "option1"
+				return &workflow.NodeResult{UpdatedState: state}, nil
+			},
+		}
+		node3 := &mockNode{
+			name: "option2",
+			executeFunc: func(state *workflow.State) (*workflow.NodeResult, error) {
+				selectedNode = "option2"
+				return &workflow.NodeResult{UpdatedState: state}, nil
+			},
+		}
+
+		graph.AddNode(node1)
+		graph.AddNode(node2)
+		graph.AddNode(node3)
+		graph.AddEdge("node1", "option1")
+		graph.AddEdge("node1", "option2")
+		graph.SetStart("node1")
+
+		executor := workflow.NewExecutor(graph, nil)
+		state := workflow.NewState("test")
+		_, err := executor.Execute(ctx, state)
+
+		if err != nil {
+			t.Errorf("Execute() error = %v", err)
+		}
+		// Should select first option
+		if selectedNode != "option1" {
+			t.Errorf("expected 'option1', got %s", selectedNode)
+		}
+	})
+
+	t.Run("no next nodes exits workflow", func(t *testing.T) {
+		graph := workflow.NewGraph()
+		callCount := 0
+
+		// Node with no outgoing edges - should exit after execution
+		node := &mockNode{
+			name: "isolated",
+			executeFunc: func(state *workflow.State) (*workflow.NodeResult, error) {
+				callCount++
+				state.ShouldContinue = true // Still wants to continue
+				return &workflow.NodeResult{UpdatedState: state}, nil
+			},
+		}
+
+		graph.AddNode(node)
+		graph.SetStart("isolated")
+
+		executor := workflow.NewExecutor(graph, nil)
+		state := workflow.NewState("test")
+		_, err := executor.Execute(ctx, state)
+
+		if err != nil {
+			t.Errorf("Execute() error = %v", err)
+		}
+		// Should execute once then exit (no edges means workflow complete)
+		if callCount != 1 {
+			t.Errorf("expected 1 execution, got %d", callCount)
+		}
+	})
+}
+
+func TestBuildDeepThinkingGraph(t *testing.T) {
+	// Create mock nodes
+	nodes := make(map[string]workflow.Node)
+	nodes["planner"] = &mockNode{name: "planner"}
+	nodes["rewriter"] = &mockNode{name: "rewriter"}
+	nodes["supervisor"] = &mockNode{name: "supervisor"}
+	nodes["retriever"] = &mockNode{name: "retriever"}
+	nodes["reranker"] = &mockNode{name: "reranker"}
+	nodes["distiller"] = &mockNode{name: "distiller"}
+	nodes["reflector"] = &mockNode{name: "reflector"}
+	nodes["policy"] = &mockNode{name: "policy"}
+
+	t.Run("builds graph with all nodes", func(t *testing.T) {
+		graph, err := workflow.BuildDeepThinkingGraph(nodes)
+		if err != nil {
+			t.Fatalf("BuildDeepThinkingGraph() failed: %v", err)
+		}
+
+		if graph == nil {
+			t.Fatal("expected graph, got nil")
+		}
+
+		// Verify all nodes are added - GetNode returns (Node, error)
+		for name := range nodes {
+			node, err := graph.GetNode(name)
+			if err != nil {
+				t.Errorf("node %s not found in graph: %v", name, err)
+			}
+			if node == nil {
+				t.Errorf("node %s is nil", name)
+			}
+		}
+
+		// Verify start node is planner
+		if graph.GetStartNode() != "planner" {
+			t.Errorf("expected start node 'planner', got %s", graph.GetStartNode())
+		}
+
+		// Verify key edges exist
+		expectedEdges := map[string]string{
+			"planner":   "rewriter",
+			"rewriter":  "supervisor",
+			"supervisor": "retriever",
+			"retriever": "reranker",
+			"reranker":  "distiller",
+			"distiller": "reflector",
+			"reflector": "policy",
+			"policy":    "rewriter",
+		}
+
+		for from, expectedTo := range expectedEdges {
+			nextNodes := graph.GetNextNodes(from)
+			found := false
+			for _, next := range nextNodes {
+				if next == expectedTo {
+					found = true
+					break
+				}
+			}
+			if !found {
+				t.Errorf("expected edge from %s to %s not found", from, expectedTo)
+			}
+		}
+	})
+
+	t.Run("missing node returns error", func(t *testing.T) {
+		incompleteNodes := make(map[string]workflow.Node)
+		incompleteNodes["planner"] = &mockNode{name: "planner"}
+		// Missing other required nodes
+
+		_, err := workflow.BuildDeepThinkingGraph(incompleteNodes)
+		if err == nil {
+			t.Error("expected error for missing nodes, got nil")
+		}
+	})
+
+	t.Run("nil nodes map returns error", func(t *testing.T) {
+		_, err := workflow.BuildDeepThinkingGraph(nil)
+		if err == nil {
+			t.Error("expected error for nil nodes map, got nil")
+		}
+	})
+
+	t.Run("empty nodes map returns error", func(t *testing.T) {
+		emptyNodes := make(map[string]workflow.Node)
+		_, err := workflow.BuildDeepThinkingGraph(emptyNodes)
+		if err == nil {
+			t.Error("expected error for empty nodes map, got nil")
+		}
+	})
+
+	t.Run("node with empty name returns error", func(t *testing.T) {
+		badNodes := make(map[string]workflow.Node)
+		badNodes["planner"] = &mockNode{name: ""} // Empty name will cause AddNode to fail
+		badNodes["rewriter"] = &mockNode{name: "rewriter"}
+		badNodes["supervisor"] = &mockNode{name: "supervisor"}
+		badNodes["retriever"] = &mockNode{name: "retriever"}
+		badNodes["reranker"] = &mockNode{name: "reranker"}
+		badNodes["distiller"] = &mockNode{name: "distiller"}
+		badNodes["reflector"] = &mockNode{name: "reflector"}
+		badNodes["policy"] = &mockNode{name: "policy"}
+
+		_, err := workflow.BuildDeepThinkingGraph(badNodes)
+		if err == nil {
+			t.Error("expected error for node with empty name, got nil")
+		}
+	})
+
+	t.Run("verify all required nodes are present", func(t *testing.T) {
+		requiredNodes := []string{"planner", "rewriter", "supervisor", "retriever", "reranker", "distiller", "reflector", "policy"}
+
+		for _, missingNode := range requiredNodes {
+			t.Run("missing_"+missingNode, func(t *testing.T) {
+				incompleteNodes := make(map[string]workflow.Node)
+				for _, name := range requiredNodes {
+					if name != missingNode {
+						incompleteNodes[name] = &mockNode{name: name}
+					}
+				}
+
+				_, err := workflow.BuildDeepThinkingGraph(incompleteNodes)
+				if err == nil {
+					t.Errorf("expected error for missing %s, got nil", missingNode)
+				}
+			})
+		}
+	})
 }

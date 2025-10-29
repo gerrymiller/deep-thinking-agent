@@ -779,7 +779,14 @@ func TestBuildStrategyPrompt(t *testing.T) {
 		t.Error("prompt should contain the query")
 	}
 
-	if !strings.Contains(prompt, "What is the capital of France?") {
-		t.Error("prompt should contain original question")
+	// Verify prompt contains strategy options
+	if !strings.Contains(prompt, "vector") {
+		t.Error("prompt should contain 'vector' strategy")
+	}
+	if !strings.Contains(prompt, "keyword") {
+		t.Error("prompt should contain 'keyword' strategy")
+	}
+	if !strings.Contains(prompt, "hybrid") {
+		t.Error("prompt should contain 'hybrid' strategy")
 	}
 }
