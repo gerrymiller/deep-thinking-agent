@@ -258,3 +258,54 @@ func TestHTMLParser_Parse(t *testing.T) {
 		}
 	})
 }
+
+func TestHTMLParser_EdgeCases(t *testing.T) {
+	parser := NewHTMLParser()
+
+	t.Run("HTML with only whitespace in body", func(t *testing.T) {
+		html := `<html><head><title>Test</title></head><body>   \n\t  </body></html>`
+		reader := strings.NewReader(html)
+		doc, err := parser.Parse(reader, "whitespace.html")
+
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if doc.Title != "Test" {
+			t.Errorf("expected title 'Test', got %s", doc.Title)
+		}
+	})
+
+	t.Run("HTML with nested divs", func(t *testing.T) {
+		html := `<html><body><div><div><div>Deeply nested content</div></div></div></body></html>`
+		reader := strings.NewReader(html)
+		doc, err := parser.Parse(reader, "nested.html")
+
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if !strings.Contains(doc.Content, "Deeply nested") {
+			t.Error("expected nested content to be extracted")
+		}
+	})
+
+	t.Run("HTML with comments", func(t *testing.T) {
+		html := `<html><body><!-- This is a comment -->Visible text</body></html>`
+		reader := strings.NewReader(html)
+		doc, err := parser.Parse(reader, "comments.html")
+
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if !strings.Contains(doc.Content, "Visible text") {
+			t.Error("expected visible text")
+		}
+
+		// Comments should not be in content
+		if strings.Contains(doc.Content, "This is a comment") {
+			t.Error("comments should not be in content")
+		}
+	})
+}
