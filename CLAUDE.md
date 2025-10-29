@@ -64,9 +64,11 @@ For new files created in future years, update the copyright year accordingly.
 #### Non-Negotiable Testing Requirements:
 1. **EVERY new package MUST have tests before committing**
 2. **EVERY new `.go` file MUST have a corresponding `_test.go` file**
-3. **Target: 100% test coverage** - measure with `go test -cover ./...`
-4. **Tests must be written BEFORE the commit**, not after
-5. **Run `go test ./...` and verify ALL tests pass before every commit**
+3. **MINIMUM: 90% test coverage** - measure with `go test -cover ./...`
+4. **Target: 100% test coverage** - always aim for complete coverage
+5. **Tests must be written BEFORE the commit**, not after
+6. **Run `go test ./...` and verify ALL tests pass before every commit**
+7. **NEVER commit code with less than 90% coverage**
 
 #### Test Quality Standards:
 - Write comprehensive unit tests for all exported functions and types
@@ -83,51 +85,56 @@ For new files created in future years, update the copyright year accordingly.
 3. Run: go test ./...
 4. Verify: All tests pass
 5. Run: go test -cover ./...
-6. Verify: Acceptable coverage (aim for 100%)
-7. ONLY THEN commit
+6. Verify: Coverage is at least 90% (absolute minimum)
+7. If coverage < 90%: Add more tests until >= 90%
+8. ONLY THEN commit
 ```
 
 **If you find yourself committing code without tests, STOP and write the tests first.**
+**If coverage is below 90%, STOP and add more tests until it reaches 90%.**
 
 #### Current Test Coverage Status
 
 As of latest update, test coverage by package:
 
-**High Coverage (>80%)**:
+**Meets 90% Requirement ✅**:
 - `internal/config` - 98.1% ✅
 - `pkg/schema` - 96.5% ✅
-- `pkg/llm/openai` - 92.7% ✅ (improved from 41.5%)
+- `pkg/llm/openai` - 92.7% ✅
 - `pkg/document/chunker` - 91.7% ✅
-- `pkg/agent` - 86.1% ✅
 
-**Moderate Coverage (50-80%)**:
-- `pkg/document/parser` - 77.1% (improved from 35.9%)
-- `pkg/retrieval` - 76.2%
-- `pkg/workflow` - 68.2%
-- `pkg/nodes` - 52.9% (improved from 16.1%)
+**Below 90% - MUST BE IMPROVED ⚠️**:
+- `pkg/agent` - 86.1% (needs +3.9% to reach 90%)
+- `pkg/document/parser` - 77.1% (needs +12.9% to reach 90%)
+- `pkg/retrieval` - 76.2% (needs +13.8% to reach 90%)
+- `pkg/workflow` - 68.2% (needs +21.8% to reach 90%)
+- `pkg/nodes` - 52.9% (needs +37.1% to reach 90%)
+- `pkg/embedding` - 45.1% (needs +44.9% to reach 90%)
 
-**Low Coverage (<50%)**:
-- `pkg/embedding` - 45.1% (improved from 35.3%)
-
-**No Tests (0%)**:
+**No Tests (0%) - URGENT ⚠️**:
 - `cmd/cli` - Requires integration testing framework
 - `cmd/common` - Requires integration testing framework
 - `pkg/vectorstore/qdrant` - Requires Qdrant test instance
-- `pkg/llm` - Interface-only package
-- `pkg/vectorstore` - Interface-only package
+- `pkg/llm` - Interface-only package (exempt)
+- `pkg/vectorstore` - Interface-only package (exempt)
 
 **Recent Improvements**:
 - Priority 3 (Test Coverage): Improved 4 packages significantly
-  - `pkg/llm/openai`: 41.5% → 92.7% (+51.2%)
-  - `pkg/document/parser`: 35.9% → 77.1% (+41.2%)
-  - `pkg/nodes`: 16.1% → 52.9% (+36.8%)
-  - `pkg/embedding`: 35.3% → 45.1% (+9.8%)
+  - `pkg/llm/openai`: 41.5% → 92.7% (+51.2%) ✅ Now meets 90%
+  - `pkg/document/parser`: 35.9% → 77.1% (+41.2%) ⚠️ Still needs work
+  - `pkg/nodes`: 16.1% → 52.9% (+36.8%) ⚠️ Still needs work
+  - `pkg/embedding`: 35.3% → 45.1% (+9.8%) ⚠️ Still needs work
 
-**Priority for Improvement**:
-1. Add integration test framework for `cmd/` packages
-2. Add `pkg/vectorstore/qdrant` tests with test containers
-3. Increase `pkg/embedding` coverage to 60%+
-4. Maintain high coverage for all packages (>80% target)
+**CRITICAL Priority for Improvement**:
+All packages below 90% MUST be improved before they can be considered complete:
+1. **pkg/embedding** - 45.1% → 90%+ (highest priority, largest gap)
+2. **pkg/nodes** - 52.9% → 90%+ (needs significant work)
+3. **pkg/workflow** - 68.2% → 90%+ (needs comprehensive tests)
+4. **pkg/retrieval** - 76.2% → 90%+ (close to target)
+5. **pkg/document/parser** - 77.1% → 90%+ (close to target)
+6. **pkg/agent** - 86.1% → 90%+ (closest to target, quick win)
+7. **cmd/** packages - Add integration test framework
+8. **pkg/vectorstore/qdrant** - Add tests with test containers
 
 ### Code Quality
 - All code must pass `go fmt`
