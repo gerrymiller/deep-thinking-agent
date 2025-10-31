@@ -82,6 +82,55 @@ The system implements an iterative workflow with 8 specialized agents:
 
 For detailed architecture documentation, see [CLAUDE.md](./CLAUDE.md).
 
+## ⚠️ Cost Warning
+
+This system uses OpenAI APIs for LLM and embedding operations. **Running the example scripts will incur API costs** (approximately $2-5 total for all examples). Individual queries cost $0.06-0.31 depending on complexity. See [examples/README.md](examples/README.md#cost-estimates) for detailed cost breakdown.
+
+**Recommendations:**
+- Set [spending limits](https://platform.openai.com/account/limits) in your OpenAI account
+- Start with simple queries to understand costs
+- Use the `--no-schema` flag for ingestion to reduce costs during testing
+
+## 5-Minute Quickstart
+
+Get up and running quickly:
+
+**1. Prerequisites:** Go 1.25.3+, Docker, OpenAI API key
+   *For detailed setup instructions, see [SETUP.md](SETUP.md)*
+
+**2. Clone & Build:**
+```bash
+git clone https://github.com/yourusername/deep-thinking-agent.git
+cd deep-thinking-agent
+go build -o bin/deep-thinking-agent ./cmd/cli
+```
+
+**3. Start Qdrant:**
+```bash
+docker run -d --name qdrant -p 6333:6333 -p 6334:6334 qdrant/qdrant
+```
+
+**4. Configure:**
+```bash
+export OPENAI_API_KEY="sk-your-key-here"
+./bin/deep-thinking-agent config init
+```
+
+**5. Run Examples:**
+```bash
+cd examples
+./01_setup.sh && ./02_ingest.sh && ./03_query.sh
+```
+
+**6. When Done:** Clean up resources
+```bash
+./examples/06_cleanup.sh
+```
+
+For detailed instructions, troubleshooting, and cleanup, see:
+- [SETUP.md](SETUP.md) - Comprehensive installation guide
+- [CLEANUP.md](CLEANUP.md) - Teardown and cleanup instructions
+
 ## Quick Start
 
 ### Prerequisites

@@ -2,6 +2,40 @@
 
 This directory contains examples demonstrating how to use the Deep Thinking Agent CLI.
 
+## ⚠️ Cost Warning
+
+These examples use OpenAI APIs and **will incur costs**. See [Cost Estimates](#cost-estimates) below for details. We recommend:
+- Setting [spending limits](https://platform.openai.com/account/limits) in your OpenAI account
+- Starting with simple examples (01-03) before running expensive ones (04-05)
+- Using `--no-schema` flag during testing to reduce costs
+
+## Automated Scripts
+
+The easiest way to run examples:
+
+| Script | Purpose | Est. Cost |
+|--------|---------|-----------|
+| `01_setup.sh` | Build and validate setup | Free |
+| `02_ingest.sh` | Ingest 3 sample documents | $0.15-0.30 |
+| `03_query.sh` | Run 4 simple queries | $0.24-0.60 |
+| `04_advanced.sh` | Run 5 complex multi-hop queries | $0.75-1.55 |
+| `05_ingestion_patterns.sh` | Test various ingestion patterns | $0.45-0.90 |
+| `06_cleanup.sh` | Clean up all resources | Free |
+
+**Total cost for all examples: $1.59-3.35**
+
+Run them in order:
+```bash
+cd examples
+./01_setup.sh
+./02_ingest.sh
+./03_query.sh
+./04_advanced.sh
+./05_ingestion_patterns.sh
+# When done:
+./06_cleanup.sh
+```
+
 ## Prerequisites
 
 1. **Build the CLI**:
@@ -226,9 +260,128 @@ The system supports multiple document formats:
 4. **Batch ingestion**: Use `-recursive` flag to ingest multiple documents at once
 5. **Collection organization**: Use different collections for different document types
 
+## Cost Estimates
+
+### Per Operation Costs (Approximate)
+
+Based on OpenAI pricing as of 2025:
+
+**Document Ingestion:**
+- With schema analysis (default): $0.012-0.052 per document
+- Without schema (`--no-schema`): $0.002-0.005 per document
+- Depends on: document length, complexity
+
+**Queries:**
+- Simple query (1-3 iterations): $0.06-0.15
+- Complex query (5-10 iterations): $0.15-0.31
+- Interactive query session (10 queries): $0.60-2.00
+- Depends on: query complexity, iterations needed, context length
+
+**Example Scripts Breakdown:**
+| Script | Operations | Estimated Cost |
+|--------|-----------|----------------|
+| 02_ingest.sh | 3 docs with schema | $0.15-0.30 |
+| 03_query.sh | 4 simple queries | $0.24-0.60 |
+| 04_advanced.sh | 5 complex queries (15-20 iter) | $0.75-1.55 |
+| 05_ingestion_patterns.sh | Multiple ingestion modes | $0.45-0.90 |
+| **Total** | | **$1.59-3.35** |
+
+### Cost Reduction Tips
+
+1. **Use `--no-schema` flag**
+   ```bash
+   ./bin/deep-thinking-agent ingest --no-schema document.txt
+   ```
+   Saves ~$0.01-0.05 per document by skipping LLM schema analysis
+
+2. **Reduce max iterations**
+   ```bash
+   ./bin/deep-thinking-agent query -max-iterations 3 "simple question"
+   ```
+   Each iteration costs ~$0.03-0.06
+
+3. **Use cheaper models** (edit config.json)
+   ```json
+   {
+     "reasoning_llm": {"model": "gpt-4o-mini"},
+     "fast_llm": {"model": "gpt-4o-mini"}
+   }
+   ```
+   Reduces costs by ~60-80% but may affect quality
+
+4. **Start with smaller documents**
+   Test with short documents before ingesting large corpora
+
+5. **Monitor usage**
+   Check [platform.openai.com/usage](https://platform.openai.com/usage) regularly
+
+### Setting Spending Limits
+
+Protect yourself from unexpected charges:
+
+1. Go to [OpenAI Billing Settings](https://platform.openai.com/account/billing/limits)
+2. Set a monthly budget limit (e.g., $10 for testing)
+3. Enable email notifications for:
+   - 75% of limit reached
+   - 90% of limit reached
+   - Limit reached
+
+## After Running Examples
+
+### Cleanup
+
+When you're done with the examples, clean up resources:
+
+```bash
+# Automated cleanup (recommended)
+./06_cleanup.sh
+
+# Or with no prompts
+./06_cleanup.sh --force
+
+# Remove everything including config and binary
+./06_cleanup.sh --all
+```
+
+This will:
+- Stop and remove Qdrant Docker container
+- Delete all test collections
+- Optionally remove generated files
+
+For detailed cleanup instructions, see [CLEANUP.md](../CLEANUP.md).
+
+### Manual Cleanup
+
+If you prefer manual cleanup:
+
+```bash
+# Stop Qdrant
+docker rm -f qdrant
+
+# Delete collections
+curl -X DELETE http://localhost:6333/collections/documents
+curl -X DELETE http://localhost:6333/collections/research
+curl -X DELETE http://localhost:6333/collections/business
+curl -X DELETE http://localhost:6333/collections/technical
+
+# Remove files (optional)
+rm config.json
+rm bin/deep-thinking-agent
+```
+
+### Check Your Costs
+
+After running examples:
+
+1. Visit [OpenAI Usage Dashboard](https://platform.openai.com/usage)
+2. Review costs by date and model
+3. Verify charges match expectations (~$2-5 for all examples)
+
 ## Next Steps
 
 - Review the main [README](../README.md) for architecture details
-- Check [CLAUDE.md](../CLAUDE.md) for development guidelines
+- Check [SETUP.md](../SETUP.md) for detailed installation guide
+- See [CLEANUP.md](../CLEANUP.md) for complete cleanup instructions
+- Read [CLAUDE.md](../CLAUDE.md) for development guidelines
 - Explore the source code in `pkg/` and `cmd/` directories
 - Experiment with different query types and document collections
