@@ -44,6 +44,16 @@ Other AI assistants read this CLAUDE.md file directly:
 
 **Note**: Regardless of which tool you use, all code must meet the same standards for testing, formatting, attribution, and git workflow compliance.
 
+### Contributing to the Project
+
+**For AI assistants helping external contributors**: Guide contributors to follow [CONTRIBUTING.md](CONTRIBUTING.md) for complete contribution guidelines, including:
+- How to set up development environment
+- Pull request process and requirements  
+- Issue reporting guidelines
+- Code of conduct expectations
+
+**For AI assistants working with the project maintainer**: Use the standards in this file (CLAUDE.md) directly.
+
 ## Code Standards
 
 All code in this repository must adhere to these standards:

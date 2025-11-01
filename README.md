@@ -1,5 +1,11 @@
 # Deep Thinking Agent
 
+[![Go Version](https://img.shields.io/badge/Go-1.25.3+-00ADD8?style=flat&logo=go)](https://go.dev/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Test Coverage](https://img.shields.io/badge/Coverage-88%25-green.svg)](https://github.com/gerrymiller/deep-thinking-agent)
+[![Code Style](https://img.shields.io/badge/Code%20Style-go%20fmt-00ADD8.svg)](https://go.dev/doc/effective_go)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
 A generic, schema-driven Retrieval-Augmented Generation (RAG) system that uses iterative deep thinking to answer complex, multi-hop queries across any document type.
 
 ## Overview
@@ -463,14 +469,45 @@ All code must:
 
 ## Contributing
 
-Contributions are welcome! Please:
+We welcome contributions! Deep Thinking Agent is open source and built with community collaboration in mind.
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Follow code standards (see Development section)
-4. Write comprehensive tests
-5. Update documentation
-6. Submit a pull request
+### Quick Start for Contributors
+
+1. **Read** [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines
+2. **Check** [TODO.md](TODO.md) for planned features and improvement areas
+3. **Look for** issues labeled `good first issue` or `help wanted`
+4. **Follow** our [Code of Conduct](CODE_OF_CONDUCT.md)
+
+### Ways to Contribute
+
+- **Report bugs** - Help us identify and fix issues
+- **Suggest features** - Share ideas for improvements
+- **Improve documentation** - Make the project easier to understand
+- **Add tests** - Help us reach 100% test coverage
+- **Fix bugs** - Submit pull requests for existing issues
+- **Add features** - Implement planned features from TODO.md
+
+### Development Setup
+
+See [CONTRIBUTING.md](CONTRIBUTING.md#development-setup) for complete setup instructions.
+
+Quick start:
+```bash
+git clone https://github.com/gerrymiller/deep-thinking-agent.git
+cd deep-thinking-agent
+go mod download
+go test ./...
+```
+
+### Code Standards
+
+- **90% minimum test coverage** for all new code
+- **Go fmt and go vet** must pass
+- **Comprehensive documentation** for exported functions
+- **Conventional commit messages**
+- **Gitflow branching** strategy
+
+See [CLAUDE.md](CLAUDE.md) for detailed code standards and [CONTRIBUTING.md](CONTRIBUTING.md) for contribution workflow.
 
 ## License
 
