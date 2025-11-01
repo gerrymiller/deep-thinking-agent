@@ -21,14 +21,28 @@ When working in this repository, AI assistants should:
    - When adding dependencies → Check if CLAUDE.md needs documentation updates
    - When changing architecture → Check if both code AND documentation reflect changes
 
-3. **Verify Before Assuming** - When configuring tooling (Claude Code, Git, CI/CD), always check official documentation before making assumptions about file patterns, naming conventions, or best practices.
+3. **Verify Before Assuming** - When configuring tooling (AI assistants, Git, CI/CD), always check official documentation before making assumptions about file patterns, naming conventions, or best practices.
 
 4. **Complete the Full Picture** - If setting up infrastructure (documentation, CI/CD, tooling), ensure ALL related components are configured optimally, not just the minimum required.
 
-### AI Assistant Configuration
-- `.claude/settings.json` - Team-wide settings (commit to git)
+### Multi-Tool Support
+
+This project is designed to work seamlessly with multiple AI coding assistants:
+
+#### Using Claude Code
+Claude Code users have access to custom slash commands and configuration:
+- `.claude/settings.json` - Team-wide settings (committed to git)
 - `.claude/settings.local.json` - Personal preferences (in .gitignore)
-- `.claude/commands/` - Custom slash commands (commit to git)
+- `.claude/commands/` - Custom slash commands for gitflow workflow
+- See [Custom Commands (Claude Code)](#custom-commands-claude-code) section below
+
+#### Using Droid or Other AI Assistants
+Other AI assistants read this CLAUDE.md file directly:
+- All coding standards, testing requirements, and workflows apply equally
+- Use standard git commands for branch management (see [Git Workflow](#git-workflow))
+- All guidelines in this file are tool-agnostic and universally applicable
+
+**Note**: Regardless of which tool you use, all code must meet the same standards for testing, formatting, attribution, and git workflow compliance.
 
 ## Code Standards
 
@@ -162,9 +176,9 @@ The following 3 packages require additional infrastructure work to reach 90%:
 ### Attribution
 **CRITICAL**: All work in this repository is authored by Gerry Miller.
 
-- **NEVER** attribute anything to "Claude Code" or any AI assistant
+- **NEVER** attribute anything to any AI assistant (Claude Code, Droid, etc.)
 - **NEVER** add "Co-Authored-By: Claude" or similar to commits
-- **NEVER** add footers like "🤖 Generated with [Claude Code]" to commits
+- **NEVER** add footers like "🤖 Generated with [tool name]" to commits
 - All code, documentation, and commits are authored by Gerry Miller
 - AI assistants are tools that help execute the author's vision, not co-authors
 
@@ -192,7 +206,9 @@ This project follows a gitflow branching strategy:
 
 ### Creating Branches
 
-Use the custom slash commands (see [Claude Code Custom Commands](#claude-code-custom-commands)) or manually:
+**Claude Code users**: Use the custom slash commands (see [Custom Commands (Claude Code)](#custom-commands-claude-code))
+
+**Manual git commands** (all AI assistants):
 
 ```bash
 # Ensure you're on develop
@@ -270,16 +286,18 @@ go mod verify
 
 ## Security
 
-This project uses Snyk for security scanning. When adding or modifying code:
+This project uses Snyk for security scanning. When adding or modifying code, AI assistants should:
 
-1. Run security scans on new first-party code using snyk_code_scan tool
-2. Fix any security issues found using Snyk's context
+1. Run security scans on new first-party code using available security scanning tools
+2. Fix any security issues found using the scanner's context
 3. Rescan after fixes to verify issues are resolved
 4. Repeat until no new issues are found
 
-## Claude Code Custom Commands
+## Custom Commands (Claude Code)
 
-This project includes custom slash commands to streamline common gitflow workflows:
+**Note**: This section is specific to Claude Code users. Other AI assistants should use the manual git commands described in the [Git Workflow](#git-workflow) section.
+
+Claude Code users have access to custom slash commands to streamline common gitflow workflows:
 
 - **`/new-feature`** - Creates a new feature branch from `develop` for new features and enhancements
 - **`/bugfix`** - Creates a new bugfix branch from `develop` for fixing bugs during development
