@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Detailed test coverage status section in README
 - Known limitations documentation for BM25 and integration testing
 - Branch protection setup guide (BRANCH_PROTECTION_GUIDE.md)
+- **Pre-commit hook** for automated quality checks (gofmt, build, test, vet)
+- Pre-commit hook setup documentation (PRE_COMMIT_HOOK_SETUP.md)
 
 ### Changed
 - **BREAKING**: `VectorStore` interface now requires `List()` method implementation
@@ -23,12 +25,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Formatting violations in 3 test files (gofmt compliance)
 - Security badge now links to SECURITY.md instead of non-configured Snyk service
 - BM25 architectural issue (no longer requires dummy embedding vectors)
+- **Compilation errors** from VectorStore.List() addition (Qdrant pointer type, agent mock)
 
 ### Documentation
 - Added honest test coverage breakdown by package
 - Documented which packages are production-ready (90%+) vs need hardening
 - Added transparency note about integration layer testing status
 - Clarified BM25 in-memory limitation for large datasets
+- Documented the build failure incident and prevention measures
 
 ---
 
