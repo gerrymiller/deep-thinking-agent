@@ -127,6 +127,11 @@ type Store interface {
 	// Get retrieves specific documents by ID.
 	Get(ctx context.Context, collectionName string, ids []string) ([]Document, error)
 
+	// List retrieves documents from a collection with optional filtering and pagination.
+	// This is useful for operations that need to scan the corpus without vector similarity,
+	// such as BM25 keyword search or corpus analysis.
+	List(ctx context.Context, collectionName string, filter Filter, limit int, offset int) ([]Document, error)
+
 	// CreateCollection creates a new collection/index with specified dimensions.
 	CreateCollection(ctx context.Context, name string, dimension int, metadata map[string]interface{}) error
 

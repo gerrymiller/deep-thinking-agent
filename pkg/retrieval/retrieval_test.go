@@ -104,6 +104,14 @@ func (m *mockVectorStore) Get(ctx context.Context, collectionName string, ids []
 	return m.searchResults, nil
 }
 
+func (m *mockVectorStore) List(ctx context.Context, collectionName string, filter vectorstore.Filter, limit int, offset int) ([]vectorstore.Document, error) {
+	if m.err != nil {
+		return nil, m.err
+	}
+	// Return search results as the corpus for BM25
+	return m.searchResults, nil
+}
+
 func (m *mockVectorStore) CreateCollection(ctx context.Context, name string, dimension int, metadata map[string]interface{}) error {
 	return m.err
 }
