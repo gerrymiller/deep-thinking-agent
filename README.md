@@ -37,6 +37,8 @@
 
 </div>
 
+> **Note**: Some badges will activate after the first workflow run and service integrations are complete. See [GITHUB_SETUP.md](GITHUB_SETUP.md) for configuration instructions.
+
 ## 🎯 Overview
 
 Traditional RAG systems struggle with complex queries that require:
@@ -614,8 +616,8 @@ Made with ❤️ and 🧠 by [Gerry Miller](https://github.com/gerrymiller)
 [coverage-url]: https://codecov.io/gh/gerrymiller/deep-thinking-agent
 [report-badge]: https://goreportcard.com/badge/github.com/gerrymiller/deep-thinking-agent?style=for-the-badge
 [report-url]: https://goreportcard.com/report/github.com/gerrymiller/deep-thinking-agent
-[security-badge]: https://img.shields.io/snyk/vulnerabilities/github/gerrymiller/deep-thinking-agent?style=for-the-badge&logo=snyk
-[security-url]: https://snyk.io/test/github/gerrymiller/deep-thinking-agent
+[security-badge]: https://img.shields.io/badge/Security-Scanning%20Enabled-green?style=for-the-badge&logo=github
+[security-url]: .github/SECURITY.md
 [stars-badge]: https://img.shields.io/github/stars/gerrymiller/deep-thinking-agent?style=social
 [stars-url]: https://github.com/gerrymiller/deep-thinking-agent/stargazers
 [issues-badge]: https://img.shields.io/github/issues/gerrymiller/deep-thinking-agent?style=flat-square
