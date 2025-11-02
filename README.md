@@ -1,14 +1,43 @@
-# Deep Thinking Agent
+<div align="center">
 
-[![Go Version](https://img.shields.io/badge/Go-1.25.3+-00ADD8?style=flat&logo=go)](https://go.dev/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Test Coverage](https://img.shields.io/badge/Coverage-88%25-green.svg)](https://github.com/gerrymiller/deep-thinking-agent)
-[![Code Style](https://img.shields.io/badge/Code%20Style-go%20fmt-00ADD8.svg)](https://go.dev/doc/effective_go)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+```
+╔═══════════════════════════════════════════════════════════════════════╗
+║                                                                       ║
+║   ____                     ________    _       __   _                 ║
+║  / __ \___  ___  ____     /_  __/ /_  (_)___  / /__(_)___  ____ _     ║
+║ / / / / _ \/ _ \/ __ \     / / / __ \/ / __ \/ //_/ / __ \/ __ `/     ║
+║/ /_/ /  __/  __/ /_/ /    / / / / / / / / / / ,< / / / / / /_/ /      ║
+║\____/\___/\___/ .___/    /_/ /_/ /_/_/_/ /_/_/|_/_/_/ /_/\__, /       ║
+║              /_/            Agent                        /____/       ║
+║                                                                       ║
+║        Schema-Driven RAG with Iterative Multi-Hop Reasoning           ║
+║                                                                       ║
+╚═══════════════════════════════════════════════════════════════════════╝
+```
 
-A generic, schema-driven Retrieval-Augmented Generation (RAG) system that uses iterative deep thinking to answer complex, multi-hop queries across any document type.
+[![Go Version][go-badge]][go-url]
+[![License][license-badge]][license-url]
+[![Release][release-badge]][release-url]
+[![CI Status][ci-badge]][ci-url]
+[![Coverage][coverage-badge]][coverage-url]
+[![Go Report][report-badge]][report-url]
+[![Security][security-badge]][security-url]
 
-## Overview
+[![GitHub Stars][stars-badge]][stars-url]
+[![Issues][issues-badge]][issues-url]
+[![PRs][prs-badge]][prs-url]
+[![Contributors][contributors-badge]][contributors-url]
+[![Last Commit][commit-badge]][commit-url]
+
+---
+
+**[Features](#key-features) • [Quickstart](#5-minute-quickstart) • [Architecture](#architecture) • [Contributing](#contributing) • [Examples](examples/)**
+
+---
+
+</div>
+
+## 🎯 Overview
 
 Traditional RAG systems struggle with complex queries that require:
 - Multi-step reasoning across multiple sources
@@ -16,14 +45,29 @@ Traditional RAG systems struggle with complex queries that require:
 - Iterative refinement based on intermediate findings
 - Integration of both internal documents and external knowledge
 
-Deep Thinking Agent solves these challenges through:
+**Deep Thinking Agent** solves these challenges with a schema-driven approach and specialized AI agents that work together through an iterative deep thinking loop.
 
-- **Schema-Driven Intelligence**: LLM analyzes documents to derive structural schemas (sections, hierarchy, semantic regions) rather than using hardcoded patterns
-- **Deep Thinking Loop**: Graph-based workflow that iteratively plans, retrieves, reflects, and decides whether findings are sufficient
-- **Multi-Strategy Retrieval**: Intelligently selects between vector search, keyword search, or hybrid approaches based on query characteristics
-- **Pluggable Architecture**: Swap LLM providers, vector stores, and document parsers without changing core logic
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                     Deep Thinking Loop                           │
+│                                                                  │
+│  Query ──▶ Plan ──▶ Route ──▶ Retrieve ──▶ Rerank ──▶ Answer     │
+│              ↑                                      ↓            │
+│              └──── Reflect ◀──── Compress ◀────────┘             │
+│                                                                  │
+│  8 Specialized Agents • Schema-Aware Retrieval • Multi-Strategy  │
+└──────────────────────────────────────────────────────────────────┘
+```
 
-## Inspiration
+### ✨ What Makes This Different?
+
+- **🔍 Schema-Driven**: LLM analyzes documents to derive structure (sections, hierarchy, semantic regions) for targeted retrieval
+- **🤔 Deep Thinking Loop**: Iterative workflow that plans, retrieves, reflects, and decides whether findings are sufficient
+- **🎯 Multi-Strategy Retrieval**: Intelligently selects between vector search, BM25 keyword search, or hybrid approaches
+- **🔌 Pluggable Architecture**: Swap LLM providers, vector stores, and document parsers without changing core logic
+- **✅ Production-Ready**: 88% test coverage, comprehensive error handling, extensive documentation
+
+## 🌟 Inspiration
 
 This project is inspired by [deep-thinking-rag](https://github.com/FareedKhan-dev/deep-thinking-rag) ([article](https://levelup.gitconnected.com/building-an-agentic-deep-thinking-rag-pipeline-to-solve-complex-queries-af69c5e044db)) but redesigned from the ground up for:
 - Generic document types (not just SEC 10-K filings)
@@ -64,29 +108,29 @@ The system implements an iterative workflow with 8 specialized agents:
 └─────────────────────────────────────────────────────────┘
                          │
 ┌─────────────────────────────────────────────────────────┐
-│              Workflow Orchestration Layer                │
+│              Workflow Orchestration Layer               │
 │    Deep Thinking Loop: Plan→Route→Retrieve→             │
-│         Rerank→Compress→Reflect→Policy                   │
+│         Rerank→Compress→Reflect→Policy                  │
 └─────────────────────────────────────────────────────────┘
                          │
 ┌─────────────────────────────────────────────────────────┐
-│                    Agent Layer                           │
+│                    Agent Layer                          │
 │  8 Specialized Agents (Planner, Rewriter, Supervisor,   │
 │  Retriever, Reranker, Distiller, Reflector, Policy)     │
 └─────────────────────────────────────────────────────────┘
                          │
 ┌─────────────────────────────────────────────────────────┐
-│              Retrieval & Storage Layer                   │
+│              Retrieval & Storage Layer                  │
 │    Vector Store • Schema Registry • Web Search          │
 └─────────────────────────────────────────────────────────┘
                          │
 ┌─────────────────────────────────────────────────────────┐
-│              Document Processing Layer                   │
+│              Document Processing Layer                  │
 │  Parser → Schema Analyzer → Chunker → Embedder          │
 └─────────────────────────────────────────────────────────┘
 ```
 
-For detailed architecture documentation, see [CLAUDE.md](./CLAUDE.md).
+For detailed architecture documentation, see [AGENTS.md](./AGENTS.md).
 
 ## ⚠️ Cost Warning
 
@@ -369,7 +413,7 @@ deep-thinking-agent/
 │   └── common/            # Shared code
 ├── examples/              # Usage examples
 ├── test/                  # Test fixtures and data
-└── CLAUDE.md             # AI assistant development guide
+└── AGENTS.md              # AI coding agent development guide
 ```
 
 ### Running Tests
@@ -507,7 +551,29 @@ go test ./...
 - **Conventional commit messages**
 - **Gitflow branching** strategy
 
-See [CLAUDE.md](CLAUDE.md) for detailed code standards and [CONTRIBUTING.md](CONTRIBUTING.md) for contribution workflow.
+See [AGENTS.md](AGENTS.md) for detailed code standards and [CONTRIBUTING.md](CONTRIBUTING.md) for contribution workflow.
+
+## 🛠️ Built With
+
+[![Go](https://img.shields.io/badge/Go-1.25.3-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://go.dev/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-API-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/)
+[![Qdrant](https://img.shields.io/badge/Qdrant-Vector_DB-DC244C?style=for-the-badge)](https://qdrant.tech/)
+[![Docker](https://img.shields.io/badge/Docker-Container-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+
+**Core Technologies:**
+- **LLM Integration**: OpenAI GPT-4 (extensible to Anthropic Claude, Ollama)
+- **Vector Database**: Qdrant (with support for Weaviate, Milvus planned)
+- **Embeddings**: OpenAI text-embedding-3-small
+- **Document Parsing**: Native Go parsers for Text, Markdown, PDF, HTML
+
+## 🤖 Development Tools
+
+This project was developed using modern AI-assisted development tools to accelerate implementation while maintaining high code quality standards:
+
+- **[Claude Code](https://claude.ai/code)** (Anthropic) - AI pair programming assistant
+- **[Droid](https://factory.ai/)** (Factory) - AI software engineering agent
+
+All code is authored by Gerry Miller with AI assistance as a productivity multiplier, similar to how developers use advanced IDEs, linters, and code completion tools. This transparency reflects our commitment to honest attribution while recognizing that AI tools are transforming software development workflows.
 
 ## License
 
@@ -517,8 +583,46 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Gerry Miller**
 Email: gerry@gerrymiller.com
+GitHub: [@gerrymiller](https://github.com/gerrymiller)
 
 ## Acknowledgments
 
 - Inspired by [deep-thinking-rag](https://github.com/FareedKhan-dev/deep-thinking-rag) by Fareed Khan
 - Built with Go and leveraging OpenAI, Qdrant, and other open source technologies
+- Community contributors who help improve and extend this project
+
+---
+
+<div align="center">
+
+Made with ❤️ and 🧠 by [Gerry Miller](https://github.com/gerrymiller)
+
+**[⭐ Star this repo](https://github.com/gerrymiller/deep-thinking-agent)** if you find it helpful!
+
+</div>
+
+<!-- Badge Definitions -->
+[go-badge]: https://img.shields.io/github/go-mod/go-version/gerrymiller/deep-thinking-agent?style=for-the-badge&logo=go&logoColor=white
+[go-url]: https://go.dev/
+[license-badge]: https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge
+[license-url]: LICENSE
+[release-badge]: https://img.shields.io/github/v/release/gerrymiller/deep-thinking-agent?style=for-the-badge&logo=github
+[release-url]: https://github.com/gerrymiller/deep-thinking-agent/releases
+[ci-badge]: https://img.shields.io/github/actions/workflow/status/gerrymiller/deep-thinking-agent/ci.yml?branch=main&style=for-the-badge&logo=github-actions&logoColor=white&label=CI
+[ci-url]: https://github.com/gerrymiller/deep-thinking-agent/actions/workflows/ci.yml
+[coverage-badge]: https://img.shields.io/codecov/c/github/gerrymiller/deep-thinking-agent?style=for-the-badge&logo=codecov&logoColor=white
+[coverage-url]: https://codecov.io/gh/gerrymiller/deep-thinking-agent
+[report-badge]: https://goreportcard.com/badge/github.com/gerrymiller/deep-thinking-agent?style=for-the-badge
+[report-url]: https://goreportcard.com/report/github.com/gerrymiller/deep-thinking-agent
+[security-badge]: https://img.shields.io/snyk/vulnerabilities/github/gerrymiller/deep-thinking-agent?style=for-the-badge&logo=snyk
+[security-url]: https://snyk.io/test/github/gerrymiller/deep-thinking-agent
+[stars-badge]: https://img.shields.io/github/stars/gerrymiller/deep-thinking-agent?style=social
+[stars-url]: https://github.com/gerrymiller/deep-thinking-agent/stargazers
+[issues-badge]: https://img.shields.io/github/issues/gerrymiller/deep-thinking-agent?style=flat-square
+[issues-url]: https://github.com/gerrymiller/deep-thinking-agent/issues
+[prs-badge]: https://img.shields.io/github/issues-pr/gerrymiller/deep-thinking-agent?style=flat-square&logo=github
+[prs-url]: https://github.com/gerrymiller/deep-thinking-agent/pulls
+[contributors-badge]: https://img.shields.io/github/contributors/gerrymiller/deep-thinking-agent?style=flat-square
+[contributors-url]: https://github.com/gerrymiller/deep-thinking-agent/graphs/contributors
+[commit-badge]: https://img.shields.io/github/last-commit/gerrymiller/deep-thinking-agent?style=flat-square
+[commit-url]: https://github.com/gerrymiller/deep-thinking-agent/commits/main

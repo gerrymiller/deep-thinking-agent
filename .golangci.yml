@@ -1,0 +1,158 @@
+# golangci-lint configuration
+# https://golangci-lint.run/usage/configuration/
+
+run:
+  timeout: 5m
+  tests: true
+  modules-download-mode: readonly
+  allow-parallel-runners: true
+
+linters:
+  enable:
+    # Default linters
+    - errcheck      # Check for unchecked errors
+    - gosimple      # Simplify code
+    - govet         # Reports suspicious constructs
+    - ineffassign   # Detect ineffectual assignments
+    - staticcheck   # Go vet on steroids
+    - unused        # Check for unused constants, variables, functions
+    
+    # Additional recommended linters
+    - gofmt         # Check gofmt formatting
+    - goimports     # Check import formatting
+    - misspell      # Find commonly misspelled English words
+    - gocritic      # Opinionated Go code checker
+    - gocyclo       # Compute cyclomatic complexity
+    - gosec         # Security-focused linter
+    - revive        # Fast, configurable, extensible linter
+    - unconvert     # Remove unnecessary type conversions
+    - unparam       # Find unused function parameters
+    - nakedret      # Find naked returns in functions
+    - prealloc      # Find slice declarations that could be preallocated
+    - exportloopref # Check for pointers to enclosing loop variables
+    - nolintlint    # Ensure nolint directives are properly formatted
+
+  disable:
+    - typecheck     # Can conflict with some build tags
+    - varcheck      # Deprecated (merged into unused)
+    - structcheck   # Deprecated (merged into unused)
+    - deadcode      # Deprecated (merged into unused)
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+    exclude-functions:
+      - fmt.Println
+      - fmt.Printf
+  
+  govet:
+    check-shadowing: true
+    enable-all: true
+  
+  gocyclo:
+    min-complexity: 15
+  
+  gosec:
+    severity: medium
+    confidence: medium
+    excludes:
+      - G104  # Audit errors not checked (handled by errcheck)
+      - G304  # File path provided as taint input (we validate paths)
+  
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+      - experimental
+      - opinionated
+    disabled-checks:
+      - whyNoLint
+      - unnamedResult
+  
+  revive:
+    severity: warning
+    rules:
+      - name: blank-imports
+      - name: context-as-argument
+      - name: context-keys-type
+      - name: dot-imports
+      - name: error-return
+      - name: error-strings
+      - name: error-naming
+      - name: exported
+      - name: if-return
+      - name: increment-decrement
+      - name: var-naming
+      - name: var-declaration
+      - name: package-comments
+      - name: range
+      - name: receiver-naming
+      - name: time-naming
+      - name: unexported-return
+      - name: indent-error-flow
+      - name: errorf
+      - name: empty-block
+      - name: superfluous-else
+      - name: unused-parameter
+      - name: unreachable-code
+      - name: redefines-builtin-id
+  
+  goimports:
+    local-prefixes: github.com/gerrymiller/deep-thinking-agent
+  
+  misspell:
+    locale: US
+  
+  nakedret:
+    max-func-lines: 30
+  
+  prealloc:
+    simple: true
+    range-loops: true
+    for-loops: true
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  
+  # Exclude known false positives
+  exclude-rules:
+    # Exclude some linters from running on tests files
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - errcheck
+        - gosec
+        - gocritic
+    
+    # Exclude example code
+    - path: examples/
+      linters:
+        - errcheck
+        - gosec
+    
+    # Allow dot imports in tests for convenience
+    - path: _test\.go
+      text: "dot-imports"
+      linters:
+        - revive
+    
+    # G304 (file path from variable) is often unavoidable
+    - text: "G304:"
+      linters:
+        - gosec
+    
+    # Allow TODO comments
+    - text: "Line contains TODO/BUG/FIXME"
+      linters:
+        - godox
+
+output:
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
+  uniq-by-line: true
+  sort-results: true

@@ -416,7 +416,7 @@ These improvements enhance production operations, performance, and user experien
 - ✅ Cost transparency documentation
 
 ### Documentation (2025-10-27 - 2025-11-01)
-- ✅ Comprehensive CLAUDE.md (695 lines)
+- ✅ Comprehensive AGENTS.md (AI coding agent guide, 705 lines)
 - ✅ Detailed README with architecture
 - ✅ SETUP.md with installation guide
 - ✅ CLEANUP.md for maintenance
@@ -448,9 +448,9 @@ When working on items from this TODO:
 1. Create a feature/bugfix/chore branch per gitflow conventions
 2. Update this file to mark items as 🟡 In Progress
 3. Ensure 90%+ test coverage for new code
-4. Update relevant documentation (CLAUDE.md, README.md)
+4. Update relevant documentation (AGENTS.md, README.md)
 5. Move completed items to the "Completed" section with date
-6. Follow all standards in CLAUDE.md
+6. Follow all standards in AGENTS.md
 
 ### Review Cycle
 

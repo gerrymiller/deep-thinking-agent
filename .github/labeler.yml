@@ -1,0 +1,78 @@
+# Package-based labels
+'pkg: llm':
+  - changed-files:
+    - any-glob-to-any-file: 'pkg/llm/**/*'
+
+'pkg: embedding':
+  - changed-files:
+    - any-glob-to-any-file: 'pkg/embedding/**/*'
+
+'pkg: vectorstore':
+  - changed-files:
+    - any-glob-to-any-file: 'pkg/vectorstore/**/*'
+
+'pkg: document':
+  - changed-files:
+    - any-glob-to-any-file: 'pkg/document/**/*'
+
+'pkg: schema':
+  - changed-files:
+    - any-glob-to-any-file: 'pkg/schema/**/*'
+
+'pkg: agent':
+  - changed-files:
+    - any-glob-to-any-file: 'pkg/agent/**/*'
+
+'pkg: workflow':
+  - changed-files:
+    - any-glob-to-any-file: 'pkg/workflow/**/*'
+
+'pkg: retrieval':
+  - changed-files:
+    - any-glob-to-any-file: 'pkg/retrieval/**/*'
+
+'pkg: nodes':
+  - changed-files:
+    - any-glob-to-any-file: 'pkg/nodes/**/*'
+
+# Type labels
+'documentation':
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.md'
+      - 'docs/**/*'
+
+'tests':
+  - changed-files:
+    - any-glob-to-any-file: '**/*_test.go'
+
+'ci/cd':
+  - changed-files:
+    - any-glob-to-any-file: '.github/**/*'
+
+'dependencies':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'go.mod'
+      - 'go.sum'
+
+# Area labels
+'cli':
+  - changed-files:
+    - any-glob-to-any-file: 'cmd/cli/**/*'
+
+'api':
+  - changed-files:
+    - any-glob-to-any-file: 'cmd/api/**/*'
+
+'examples':
+  - changed-files:
+    - any-glob-to-any-file: 'examples/**/*'
+
+'configuration':
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'internal/config/**/*'
+      - 'config.json'
+      - 'config.example.json'
+      - '**/*.json'

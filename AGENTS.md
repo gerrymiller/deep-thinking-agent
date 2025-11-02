@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to AI assistants when working with code in this repository.
+This file provides guidance to AI coding agents and assistants when working with code in this repository.
 
 ## Project Overview
 
@@ -17,8 +17,8 @@ When working in this repository, AI assistants should:
 1. **Be Proactive, Not Reactive** - Don't just complete the task asked. Continuously assess the project state and optimize related configurations, documentation, and code without waiting to be prompted.
 
 2. **Think Holistically** - When touching one file or system, consider all related files that might need updates:
-   - When updating CLAUDE.md → Check if .gitignore needs optimization
-   - When adding dependencies → Check if CLAUDE.md needs documentation updates
+   - When updating AGENTS.md → Check if .gitignore needs optimization
+   - When adding dependencies → Check if AGENTS.md needs documentation updates
    - When changing architecture → Check if both code AND documentation reflect changes
 
 3. **Verify Before Assuming** - When configuring tooling (AI assistants, Git, CI/CD), always check official documentation before making assumptions about file patterns, naming conventions, or best practices.
@@ -37,7 +37,7 @@ Claude Code users have access to custom slash commands and configuration:
 - See [Custom Commands (Claude Code)](#custom-commands-claude-code) section below
 
 #### Using Droid or Other AI Assistants
-Other AI assistants read this CLAUDE.md file directly:
+Other AI assistants read this AGENTS.md file directly:
 - All coding standards, testing requirements, and workflows apply equally
 - Use standard git commands for branch management (see [Git Workflow](#git-workflow))
 - All guidelines in this file are tool-agnostic and universally applicable
@@ -52,7 +52,7 @@ Other AI assistants read this CLAUDE.md file directly:
 - Issue reporting guidelines
 - Code of conduct expectations
 
-**For AI assistants working with the project maintainer**: Use the standards in this file (CLAUDE.md) directly.
+**For AI assistants working with the project maintainer**: Use the standards in this file (AGENTS.md) directly.
 
 ## Code Standards
 
@@ -178,7 +178,7 @@ The following 3 packages require additional infrastructure work to reach 90%:
 - Keep functions focused and testable
 
 ### Documentation
-- Update CLAUDE.md when adding new architectural components
+- Update AGENTS.md when adding new architectural components
 - Update README.md for user-facing changes
 - Include inline comments for complex logic
 - Write clear commit messages following conventional commits style

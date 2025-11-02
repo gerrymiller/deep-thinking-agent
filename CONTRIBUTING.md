@@ -206,7 +206,7 @@ git rebase --continue
 
 ## Code Standards
 
-All contributions must adhere to project standards. See [CLAUDE.md](CLAUDE.md) for complete details.
+All contributions must adhere to project standards. See [AGENTS.md](AGENTS.md) for complete details.
 
 ### File Headers
 
@@ -244,7 +244,7 @@ Every new `.go` file must include:
 
 - **Document all exported types and functions** with godoc comments
 - **Update README.md** for user-facing changes
-- **Update CLAUDE.md** for architectural changes
+- **Update AGENTS.md** for architectural changes
 - **Add examples** for complex functionality
 
 Example:
@@ -449,7 +449,7 @@ func TestAnalyzer_BuildPrompt(t *testing.T) {
 
 - **GitHub Issues** - For bugs, features, and questions
 - **Discussions** - For general questions and ideas
-- **Documentation** - Check [README.md](README.md), [SETUP.md](SETUP.md), and [CLAUDE.md](CLAUDE.md)
+- **Documentation** - Check [README.md](README.md), [SETUP.md](SETUP.md), and [AGENTS.md](AGENTS.md)
 
 ### Code Review Philosophy
 

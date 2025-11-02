@@ -382,6 +382,6 @@ After running examples:
 - Review the main [README](../README.md) for architecture details
 - Check [SETUP.md](../SETUP.md) for detailed installation guide
 - See [CLEANUP.md](../CLEANUP.md) for complete cleanup instructions
-- Read [CLAUDE.md](../CLAUDE.md) for development guidelines
+- Read [AGENTS.md](../AGENTS.md) for development guidelines
 - Explore the source code in `pkg/` and `cmd/` directories
 - Experiment with different query types and document collections
