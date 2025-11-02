@@ -42,29 +42,19 @@ func (k *KeywordRetriever) Search(ctx context.Context, query string, topK int, f
 	}
 
 	// Fetch documents from store for BM25 scoring
-	// Note: In production, use an inverted index to avoid full corpus scan
-	// For now, we fetch a larger set and score them
+	// Note: In production, use an inverted index or Elasticsearch for better performance
+	// For now, we fetch a corpus sample and score them
 	fetchLimit := topK * 10 // Fetch more docs than needed for better scoring
 	if fetchLimit < 100 {
 		fetchLimit = 100 // Minimum corpus size for meaningful BM25
 	}
 
-	// Create a dummy query vector for store.Search (not used for scoring)
-	// We're using the vector store's Search to fetch documents with filters
-	dummyVector := make([]float32, 1536) // Standard embedding dimension
-	searchReq := &vectorstore.SearchRequest{
-		Vector:   dummyVector,
-		TopK:     fetchLimit,
-		Filter:   filters,
-		MinScore: 0.0, // Get all docs regardless of vector similarity
-	}
-
-	searchResp, err := k.store.Search(ctx, searchReq)
+	// Use List() to fetch documents without requiring vector similarity
+	// This is more efficient than the previous dummy vector approach
+	allDocs, err := k.store.List(ctx, "", filters, fetchLimit, 0)
 	if err != nil {
 		return nil, err
 	}
-
-	allDocs := searchResp.Documents
 	if len(allDocs) == 0 {
 		return []vectorstore.Document{}, nil
 	}

@@ -298,6 +298,67 @@ func (s *Store) Get(ctx context.Context, collectionName string, ids []string) ([
 	return documents, nil
 }
 
+// List retrieves documents from a collection with optional filtering and pagination.
+func (s *Store) List(ctx context.Context, collectionName string, filter vectorstore.Filter, limit int, offset int) ([]vectorstore.Document, error) {
+	if collectionName == "" {
+		collectionName = s.config.DefaultCollection
+	}
+	if limit <= 0 {
+		limit = 100 // Default limit
+	}
+
+	// Build scroll request
+	scrollReq := &pb.ScrollPoints{
+		CollectionName: collectionName,
+		Limit:          uint32(limit),
+		Offset:         nil, // Qdrant uses ID-based pagination, not numeric offset
+		WithPayload:    &pb.WithPayloadSelector{SelectorOptions: &pb.WithPayloadSelector_Enable{Enable: true}},
+		WithVectors:    &pb.WithVectorsSelector{SelectorOptions: &pb.WithVectorsSelector_Enable{Enable: true}},
+	}
+
+	// Add filter if provided
+	if filter != nil {
+		scrollReq.Filter = convertToQdrantFilter(filter)
+	}
+
+	// Execute scroll (list) operation
+	resp, err := s.client.Scroll(ctx, scrollReq)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list documents: %w", err)
+	}
+
+	// Convert results
+	documents := make([]vectorstore.Document, 0, len(resp.Result))
+	for _, point := range resp.Result {
+		doc := vectorstore.Document{
+			ID:       point.Id.GetUuid(),
+			Metadata: make(map[string]interface{}),
+		}
+
+		// Extract vector
+		if vector := point.Vectors.GetVector(); vector != nil {
+			doc.Embedding = vector.Data
+		}
+
+		// Extract content and metadata
+		if point.Payload != nil {
+			if contentVal, ok := point.Payload["content"]; ok {
+				doc.Content = contentVal.GetStringValue()
+			}
+
+			for k, v := range point.Payload {
+				if k != "content" {
+					doc.Metadata[k] = convertFromQdrantValue(v)
+				}
+			}
+		}
+
+		documents = append(documents, doc)
+	}
+
+	return documents, nil
+}
+
 // CreateCollection creates a new collection/index with specified dimensions.
 func (s *Store) CreateCollection(ctx context.Context, name string, dimension int, metadata map[string]interface{}) error {
 	if name == "" {
