@@ -308,9 +308,10 @@ func (s *Store) List(ctx context.Context, collectionName string, filter vectorst
 	}
 
 	// Build scroll request
+	limitVal := uint32(limit)
 	scrollReq := &pb.ScrollPoints{
 		CollectionName: collectionName,
-		Limit:          uint32(limit),
+		Limit:          &limitVal,
 		Offset:         nil, // Qdrant uses ID-based pagination, not numeric offset
 		WithPayload:    &pb.WithPayloadSelector{SelectorOptions: &pb.WithPayloadSelector_Enable{Enable: true}},
 		WithVectors:    &pb.WithVectorsSelector{SelectorOptions: &pb.WithVectorsSelector_Enable{Enable: true}},
