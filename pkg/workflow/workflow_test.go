@@ -860,7 +860,6 @@ func TestState_GetRetrievalContext(t *testing.T) {
 
 }
 
-
 // TestExecutor_RouteNext tests the routeNext logic indirectly through Execute
 func TestExecutor_RouteNext(t *testing.T) {
 	ctx := context.Background()
@@ -1020,14 +1019,14 @@ func TestBuildDeepThinkingGraph(t *testing.T) {
 
 		// Verify key edges exist
 		expectedEdges := map[string]string{
-			"planner":   "rewriter",
-			"rewriter":  "supervisor",
+			"planner":    "rewriter",
+			"rewriter":   "supervisor",
 			"supervisor": "retriever",
-			"retriever": "reranker",
-			"reranker":  "distiller",
-			"distiller": "reflector",
-			"reflector": "policy",
-			"policy":    "rewriter",
+			"retriever":  "reranker",
+			"reranker":   "distiller",
+			"distiller":  "reflector",
+			"reflector":  "policy",
+			"policy":     "rewriter",
 		}
 
 		for from, expectedTo := range expectedEdges {
