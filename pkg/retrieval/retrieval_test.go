@@ -586,7 +586,7 @@ func TestCalculateAvgDocLength(t *testing.T) {
 
 	t.Run("multiple documents", func(t *testing.T) {
 		docs := []vectorstore.Document{
-			{Content: "hello world"},       // 2 tokens
+			{Content: "hello world"},        // 2 tokens
 			{Content: "test document here"}, // 3 tokens
 			{Content: "one"},                // 1 token
 		}

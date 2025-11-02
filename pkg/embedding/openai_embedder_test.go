@@ -153,8 +153,8 @@ func TestOpenAIEmbedder_Embed_ErrorCases(t *testing.T) {
 			errMsg:  "texts cannot be empty",
 		},
 		{
-			name: "nil texts slice",
-			req:  &EmbedRequest{Texts: nil},
+			name:    "nil texts slice",
+			req:     &EmbedRequest{Texts: nil},
 			wantErr: true,
 			errMsg:  "texts cannot be empty",
 		},
