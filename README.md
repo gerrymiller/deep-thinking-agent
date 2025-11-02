@@ -67,14 +67,14 @@ Traditional RAG systems struggle with complex queries that require:
 - **🤔 Deep Thinking Loop**: Iterative workflow that plans, retrieves, reflects, and decides whether findings are sufficient
 - **🎯 Multi-Strategy Retrieval**: Intelligently selects between vector search, BM25 keyword search, or hybrid approaches
 - **🔌 Pluggable Architecture**: Swap LLM providers, vector stores, and document parsers without changing core logic
-- **✅ Production-Ready**: 88% test coverage, comprehensive error handling, extensive documentation
+- **✅ Production-Grade Core**: 7 packages with 90%+ test coverage, integration layer hardening in progress ([see status](TODO.md))
 
 ## 🌟 Inspiration
 
 This project is inspired by [deep-thinking-rag](https://github.com/FareedKhan-dev/deep-thinking-rag) ([article](https://levelup.gitconnected.com/building-an-agentic-deep-thinking-rag-pipeline-to-solve-complex-queries-af69c5e044db)) but redesigned from the ground up for:
 - Generic document types (not just SEC 10-K filings)
 - Pluggable components for maximum flexibility
-- Production-ready Go implementation with comprehensive testing
+- Production-grade architecture with strong reference implementation
 
 ## Key Features
 
@@ -512,6 +512,33 @@ All code must:
 - Configuration management commands
 - Comprehensive examples and documentation
 - Automated example scripts
+
+### Current Status & Test Coverage
+
+**Overall Coverage**: ~70-75% (weighted by code volume)
+
+**High-Quality Packages** (90%+ coverage, production-ready):
+- `pkg/schema` - 96.5% (Schema analysis and management)
+- `pkg/retrieval` - 95.0% (Retrieval strategies)
+- `internal/config` - 98.1% (Configuration)
+- `pkg/llm/openai` - 92.7% (LLM integration)
+- `pkg/document/chunker` - 91.7% (Document chunking)
+- `pkg/agent` - 91.2% (8 specialized agents)
+- `pkg/workflow` - 89.9% (Workflow orchestration)
+
+**Needs Hardening** (integration & infrastructure):
+- `pkg/vectorstore/qdrant` - 0.0% (Database client, needs testcontainers)
+- `pkg/embedding` - 45.1% (API mocking needed)
+- `pkg/nodes` - 52.9% (Complex state setup required)
+- `cmd/cli` - 0.0% (Integration tests)
+- `cmd/common` - 0.0% (Integration tests)
+- `pkg/document/parser` - 84.1% (PDF test fixtures needed)
+
+**Known Limitations**:
+- BM25 keyword search uses in-memory indexing (suitable for moderate datasets, consider Elasticsearch for large-scale production)
+- Integration layer testing deferred (requires complex test infrastructure)
+
+See [TODO.md](TODO.md) for detailed roadmap and [CONTRIBUTING.md](CONTRIBUTING.md) for how to help improve coverage.
 
 ## Contributing
 
