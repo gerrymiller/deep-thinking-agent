@@ -212,7 +212,7 @@ This project follows a gitflow branching strategy:
     - Example: `release/v1.0.0`
     - Must merge to both `main` AND `develop`
 
-**Note**: This repository currently has no remote configured. All work is local-only. Commands like `git push` and `git pull` are not needed until a remote repository is added.
+**Remote Repository**: https://github.com/gerrymiller/deep-thinking-agent
 
 ### Creating Branches
 
@@ -221,8 +221,9 @@ This project follows a gitflow branching strategy:
 **Manual git commands** (all AI assistants):
 
 ```bash
-# Ensure you're on develop
+# Sync with remote before starting new work
 git checkout develop
+git pull origin develop
 
 # Create and checkout a new branch
 git checkout -b <branch-type>/<description>
@@ -239,15 +240,18 @@ go vet ./...
 git add .
 git commit -m "Description of changes"
 
-# Merge back to develop
+# Push your feature branch to remote
+git push origin <branch-name>
+
+# Merge back to develop (via pull request on GitHub)
+# OR merge locally if needed:
 git checkout develop
+git pull origin develop  # Ensure develop is up to date
 git merge <branch-name>
+git push origin develop
 ```
 
-**When a remote repository is added later**, update the workflow to include:
-- `git pull origin develop` before creating branches
-- `git push origin <branch-name>` after committing
-- `git push origin develop` after merging
+**Best Practice**: Use pull requests on GitHub for code review before merging to `develop`
 
 ## Development Commands
 
