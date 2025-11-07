@@ -205,7 +205,36 @@ telnet localhost 6334
 
 ### Setting the API Key
 
-#### Linux/macOS
+#### Using .env File (Recommended)
+
+The easiest way to configure your API key is using a `.env` file:
+
+```bash
+# Copy the example template
+cp .env.example .env
+
+# Edit .env and add your API key
+# The file should contain:
+# OPENAI_API_KEY=sk-your-key-here
+```
+
+The CLI will automatically load `.env` and `.env.local` files when you run commands. You can also override specific settings using `.env.local` (useful for testing different configurations):
+
+```bash
+# .env - Your main configuration
+OPENAI_API_KEY=sk-your-key-here
+
+# .env.local - Local overrides (optional)
+REASONING_LLM_MODEL=gpt-4o-mini
+```
+
+**Note**: Both `.env` and `.env.local` are already in `.gitignore` to protect your API keys.
+
+#### Using Environment Variables (Alternative)
+
+Alternatively, you can set environment variables directly:
+
+**Linux/macOS:**
 
 ```bash
 # Temporary (current session only)
@@ -216,7 +245,7 @@ echo 'export OPENAI_API_KEY="sk-your-key-here"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-#### Windows (PowerShell)
+**Windows (PowerShell):**
 
 ```powershell
 # Temporary
@@ -226,7 +255,7 @@ $env:OPENAI_API_KEY="sk-your-key-here"
 [System.Environment]::SetEnvironmentVariable('OPENAI_API_KEY', 'sk-your-key-here', 'User')
 ```
 
-#### Windows (Command Prompt)
+**Windows (Command Prompt):**
 
 ```cmd
 # Temporary
@@ -239,7 +268,11 @@ setx OPENAI_API_KEY "sk-your-key-here"
 ### Verify API Key
 
 ```bash
-# Check environment variable is set
+# If using .env file, the CLI loads it automatically
+# You can verify with:
+grep OPENAI_API_KEY .env
+
+# If using environment variables, check it's set:
 echo $OPENAI_API_KEY  # Should print your key
 
 # Test API access (requires curl and jq)

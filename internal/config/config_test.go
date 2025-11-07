@@ -297,6 +297,78 @@ func TestLoadFromEnv(t *testing.T) {
 	}
 }
 
+// TestLoadFromEnv_EnvFiles verifies that .env files populate configuration values when environment variables are otherwise unset.
+func TestLoadFromEnv_EnvFiles(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	// Ensure relevant environment variables are cleared (set to empty so helper can populate them, and they are restored after test).
+	envKeys := []string{
+		"REASONING_LLM_PROVIDER",
+		"REASONING_LLM_API_KEY",
+		"REASONING_LLM_MODEL",
+		"FAST_LLM_PROVIDER",
+		"FAST_LLM_API_KEY",
+		"FAST_LLM_MODEL",
+		"EMBEDDING_PROVIDER",
+		"EMBEDDING_API_KEY",
+		"EMBEDDING_MODEL",
+		"VECTOR_STORE_TYPE",
+		"VECTOR_STORE_ADDRESS",
+		"VECTOR_STORE_COLLECTION",
+	}
+
+	for _, key := range envKeys {
+		t.Setenv(key, "")
+	}
+
+	// Create .env and .env.local files. The local file should override shared defaults.
+	envContent := "REASONING_LLM_PROVIDER=openai\nREASONING_LLM_API_KEY=base-key\nFAST_LLM_PROVIDER=openai\nFAST_LLM_API_KEY=base-key\n"
+	if err := os.WriteFile(filepath.Join(tmpDir, ".env"), []byte(envContent), 0o600); err != nil {
+		t.Fatalf("failed to write .env: %v", err)
+	}
+
+	localContent := "REASONING_LLM_PROVIDER=anthropic\nREASONING_LLM_API_KEY=local-key\nFAST_LLM_PROVIDER=anthropic\nFAST_LLM_API_KEY=local-key\nEMBEDDING_PROVIDER=openai\nEMBEDDING_API_KEY=embed-key\nEMBEDDING_MODEL=text-embedding-3-large\nVECTOR_STORE_TYPE=weaviate\nVECTOR_STORE_ADDRESS=weaviate:8080\nVECTOR_STORE_COLLECTION=custom_docs\n"
+	if err := os.WriteFile(filepath.Join(tmpDir, ".env.local"), []byte(localContent), 0o600); err != nil {
+		t.Fatalf("failed to write .env.local: %v", err)
+	}
+
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("failed to get working directory: %v", err)
+	}
+	defer func() {
+		_ = os.Chdir(wd)
+	}()
+
+	if err := os.Chdir(tmpDir); err != nil {
+		t.Fatalf("failed to chdir: %v", err)
+	}
+
+	cfg := LoadFromEnv()
+
+	if cfg.LLM.ReasoningLLM.Provider != "anthropic" {
+		t.Fatalf("expected reasoning provider from .env.local, got %s", cfg.LLM.ReasoningLLM.Provider)
+	}
+	if cfg.LLM.ReasoningLLM.APIKey != "local-key" {
+		t.Fatalf("expected reasoning API key from .env.local, got %s", cfg.LLM.ReasoningLLM.APIKey)
+	}
+	if cfg.LLM.FastLLM.Provider != "anthropic" {
+		t.Fatalf("expected fast provider from .env.local, got %s", cfg.LLM.FastLLM.Provider)
+	}
+	if cfg.Embedding.APIKey != "embed-key" {
+		t.Fatalf("expected embedding API key from .env.local, got %s", cfg.Embedding.APIKey)
+	}
+	if cfg.VectorStore.Type != "weaviate" {
+		t.Fatalf("expected vector store type from .env.local, got %s", cfg.VectorStore.Type)
+	}
+	if cfg.VectorStore.Address != "weaviate:8080" {
+		t.Fatalf("expected vector store address from .env.local, got %s", cfg.VectorStore.Address)
+	}
+	if cfg.VectorStore.DefaultCollection != "custom_docs" {
+		t.Fatalf("expected vector store collection from .env.local, got %s", cfg.VectorStore.DefaultCollection)
+	}
+}
+
 // TestSaveToFile tests saving configuration to a JSON file.
 func TestSaveToFile(t *testing.T) {
 	config := &Config{

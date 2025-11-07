@@ -7,8 +7,11 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
+
+	"github.com/joho/godotenv"
 
 	"deep-thinking-agent/pkg/embedding"
 	"deep-thinking-agent/pkg/llm"
@@ -123,6 +126,8 @@ func LoadFromFile(path string) (*Config, error) {
 // LoadFromEnv loads configuration from environment variables.
 // This is useful for containerized deployments.
 func LoadFromEnv() *Config {
+	loadEnvFiles()
+
 	config := &Config{
 		LLM: LLMConfig{
 			ReasoningLLM: LLMProviderConfig{
@@ -302,4 +307,29 @@ func getEnv(key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
+}
+
+func loadEnvFiles() {
+	envFiles := []string{".env", ".env.local"}
+	merged := make(map[string]string)
+
+	for _, file := range envFiles {
+		envMap, err := godotenv.Read(file)
+		if err != nil {
+			if errors.Is(err, os.ErrNotExist) {
+				continue
+			}
+			continue
+		}
+		for key, value := range envMap {
+			merged[key] = value
+		}
+	}
+
+	for key, value := range merged {
+		current, exists := os.LookupEnv(key)
+		if !exists || current == "" {
+			_ = os.Setenv(key, value)
+		}
+	}
 }

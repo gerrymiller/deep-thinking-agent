@@ -164,9 +164,10 @@ docker run -d --name qdrant -p 6333:6333 -p 6334:6334 qdrant/qdrant
 
 **4. Configure:**
 ```bash
-export OPENAI_API_KEY="sk-your-key-here"
+cp .env.example .env
 ./bin/deep-thinking-agent config init
 ```
+Update `.env` with `OPENAI_API_KEY=sk-your-key-here` (or export `OPENAI_API_KEY` directly if you prefer shell variables).
 
 **5. Run Examples:**
 ```bash
@@ -227,11 +228,12 @@ Initialize a default configuration:
 ./bin/deep-thinking-agent config init
 ```
 
-This creates `config.json`. Edit it to add your API key, or set environment variable:
+This creates `config.json`. Edit it to add your API key. The CLI automatically loads variables from `.env` or `.env.local`, so you can keep secrets there or export the variable manually:
 
 ```bash
 export OPENAI_API_KEY="your-openai-key-here"
 ```
+Copy `.env.example` to `.env` and populate it if you prefer file-based environment variables.
 
 Validate your configuration:
 

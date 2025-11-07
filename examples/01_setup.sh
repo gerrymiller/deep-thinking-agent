@@ -21,7 +21,13 @@ echo ""
 # Check for OpenAI API key
 if [ -z "$OPENAI_API_KEY" ]; then
     echo "Warning: OPENAI_API_KEY environment variable not set"
-    echo "Please set it with: export OPENAI_API_KEY='your-key-here'"
+    echo ""
+    echo "You can configure it using a .env file (recommended):"
+    echo "  cp .env.example .env"
+    echo "  # Edit .env to add your API key"
+    echo ""
+    echo "Or set it as an environment variable:"
+    echo "  export OPENAI_API_KEY='your-key-here'"
     echo ""
 fi
 

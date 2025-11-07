@@ -96,12 +96,22 @@ Ensure you have:
    go mod verify
    ```
 
-5. **Start Qdrant** (for integration tests):
+5. **Configure API key**:
+   ```bash
+   # Copy the .env template
+   cp .env.example .env
+   
+   # Edit .env to add your OPENAI_API_KEY
+   # Or set environment variable:
+   export OPENAI_API_KEY="sk-your-key-here"
+   ```
+
+6. **Start Qdrant** (for integration tests):
    ```bash
    docker run -p 6333:6333 -p 6334:6334 qdrant/qdrant
    ```
 
-6. **Run tests** to verify setup:
+7. **Run tests** to verify setup:
    ```bash
    go test ./...
    ```

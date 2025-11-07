@@ -49,15 +49,20 @@ cd examples
    docker run -p 6333:6333 -p 6334:6334 qdrant/qdrant
    ```
 
-3. **Set environment variables**:
+3. **Configure API key**:
    ```bash
+   # Option 1: Using .env file (recommended)
+   cp .env.example .env
+   # Edit .env to add your OPENAI_API_KEY
+   
+   # Option 2: Using environment variable
    export OPENAI_API_KEY="your-api-key-here"
    ```
 
-4. **Create configuration**:
+4. **Create configuration** (optional):
    ```bash
    cp examples/config.example.json config.json
-   # Edit config.json if needed
+   # Edit config.json if needed (CLI works without it using defaults)
    ```
 
 ## Example 1: Basic Setup

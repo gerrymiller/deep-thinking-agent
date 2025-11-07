@@ -7,8 +7,11 @@ package common
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 // Config represents the complete application configuration.
@@ -57,6 +60,8 @@ type WorkflowConfig struct {
 
 // LoadConfig loads configuration from a JSON file.
 func LoadConfig(path string) (*Config, error) {
+	loadEnvFiles()
+
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read config file: %w", err)
@@ -111,5 +116,31 @@ func DefaultConfig() *Config {
 			TopNReranking:   3,
 			DefaultStrategy: "hybrid",
 		},
+	}
+}
+
+func loadEnvFiles() {
+	envFiles := []string{".env", ".env.local"}
+	merged := make(map[string]string)
+
+	for _, file := range envFiles {
+		envMap, err := godotenv.Read(file)
+		if err != nil {
+			if errors.Is(err, os.ErrNotExist) {
+				continue
+			}
+			// Ignore other read errors to avoid blocking config loading.
+			continue
+		}
+		for key, value := range envMap {
+			merged[key] = value
+		}
+	}
+
+	for key, value := range merged {
+		current, exists := os.LookupEnv(key)
+		if !exists || current == "" {
+			_ = os.Setenv(key, value)
+		}
 	}
 }
