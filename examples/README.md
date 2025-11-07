@@ -24,16 +24,15 @@ The easiest way to run examples:
 
 **Total cost for all examples: $1.59-3.35**
 
-Run them in order:
+Run them in order from the project root:
 ```bash
-cd examples
-./01_setup.sh
-./02_ingest.sh
-./03_query.sh
-./04_advanced.sh
-./05_ingestion_patterns.sh
+./examples/01_setup.sh
+./examples/02_ingest.sh
+./examples/03_query.sh
+./examples/04_advanced.sh
+./examples/05_ingestion_patterns.sh
 # When done:
-./06_cleanup.sh
+./examples/06_cleanup.sh
 ```
 
 ## Prerequisites

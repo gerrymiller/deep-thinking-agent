@@ -15,12 +15,11 @@ Complete guide for cleaning up Deep Thinking Agent resources, stopping services,
 The fastest way to clean up everything:
 
 ```bash
-# Run the automated cleanup script
-cd examples
-./06_cleanup.sh
+# Run the automated cleanup script from project root
+./examples/06_cleanup.sh
 
 # Or with no prompts (automatic mode)
-./06_cleanup.sh --force
+./examples/06_cleanup.sh --force
 ```
 
 This script will:
