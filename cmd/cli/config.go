@@ -111,7 +111,7 @@ func initConfig(args []string) error {
 	fmt.Println("\nNext steps:")
 	fmt.Println("1. Edit the config file to add your API keys")
 	fmt.Println("2. Configure your vector store connection")
-	fmt.Println("3. Run 'deep-thinking-agent config validate' to verify")
+	fmt.Printf("3. Run 'deep-thinking-agent config validate %s' to verify\n", outputPath)
 
 	return nil
 }
