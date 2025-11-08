@@ -201,11 +201,11 @@ func TestLoadFromEnv(t *testing.T) {
 				if c.LLM.ReasoningLLM.Provider != "openai" {
 					t.Errorf("expected default provider openai, got %s", c.LLM.ReasoningLLM.Provider)
 				}
-				if c.LLM.ReasoningLLM.Model != "gpt-5" {
-					t.Errorf("expected default model gpt-4, got %s", c.LLM.ReasoningLLM.Model)
+				if c.LLM.ReasoningLLM.Model != "gpt-4o" {
+					t.Errorf("expected default model gpt-4o, got %s", c.LLM.ReasoningLLM.Model)
 				}
-				if c.LLM.FastLLM.Model != "gpt-5-mini" {
-					t.Errorf("expected default fast model gpt-3.5-turbo, got %s", c.LLM.FastLLM.Model)
+				if c.LLM.FastLLM.Model != "gpt-4o-mini" {
+					t.Errorf("expected default fast model gpt-4o-mini, got %s", c.LLM.FastLLM.Model)
 				}
 				if c.Embedding.Model != "text-embedding-3-small" {
 					t.Errorf("expected default embedding model, got %s", c.Embedding.Model)
