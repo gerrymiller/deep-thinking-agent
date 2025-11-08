@@ -534,12 +534,12 @@ Configuration via JSON file or environment variables (see `internal/config/confi
   "llm": {
     "reasoning_llm": {
       "provider": "openai",
-      "model": "gpt-5",
+      "model": "gpt-4o",
       "default_temperature": 0.7
     },
     "fast_llm": {
       "provider": "openai",
-      "model": "gpt-5-mini",
+      "model": "gpt-4o-mini",
       "default_temperature": 0.5
     }
   },
