@@ -1,5 +1,53 @@
 # AGENTS.md
 
+## ⚠️ CRITICAL: NEVER COMMIT DIRECTLY TO MAIN ⚠️
+
+**STOP AND READ THIS BEFORE ANY COMMIT**
+
+### Mandatory Pre-Commit Checklist for AI Assistants:
+
+Before EVERY commit, AI assistants MUST:
+
+1. ✅ **Verify current branch**: Run `git rev-parse --abbrev-ref HEAD`
+   - ❌ If output is `main` → **STOP! Checkout develop or create feature branch**
+   - ✅ If output is `develop` or `feature/*` or `bugfix/*` or `chore/*` or `hotfix/*` → OK to proceed
+
+2. ✅ **Pre-commit hook will block**: The `.git/hooks/pre-commit` hook automatically blocks commits to `main`
+
+3. ✅ **Follow gitflow workflow**:
+   ```bash
+   # CORRECT workflow:
+   git checkout develop
+   git checkout -b feature/your-feature-name
+   # ... make changes ...
+   git commit -m "Your message"
+   
+   # NEVER do this:
+   git checkout main
+   git commit -m "Your message"  # ❌ FORBIDDEN
+   ```
+
+### Why This Matters:
+
+- Direct commits to `main` bypass code review and CI/CD
+- Breaks gitflow workflow discipline
+- Creates sync issues between `main` and `develop` branches
+- Can cause lost work through orphaned commits
+- Violates production-ready branch protection
+
+### Incident History:
+
+**2025-11-08: Direct Commits to Main Branch**
+- **What happened**: AI assistant made 3 commits directly to `main` instead of using feature branch workflow
+- **Impact**: Lost a day of development work, created orphaned commits, required manual recovery
+- **Root cause**: Failed to verify current branch before committing
+- **Resolution**: Implemented 5-layer defense (pre-commit hook, branch protection, documentation, checklist, git config)
+- **Lesson**: ALWAYS verify branch before ANY commit
+
+**See [AI_SAFETY_CHECKLIST.md](AI_SAFETY_CHECKLIST.md) for detailed safety procedures.**
+
+---
+
 This file provides guidance to AI coding agents and assistants when working with code in this repository.
 
 ## Project Overview
@@ -486,12 +534,12 @@ Configuration via JSON file or environment variables (see `internal/config/confi
   "llm": {
     "reasoning_llm": {
       "provider": "openai",
-      "model": "gpt-4o",
+      "model": "gpt-5",
       "default_temperature": 0.7
     },
     "fast_llm": {
       "provider": "openai",
-      "model": "gpt-4o-mini",
+      "model": "gpt-5-mini",
       "default_temperature": 0.5
     }
   },

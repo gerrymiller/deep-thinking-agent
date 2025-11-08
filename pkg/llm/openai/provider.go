@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"deep-thinking-agent/pkg/llm"
@@ -98,19 +99,31 @@ func (p *Provider) Complete(ctx context.Context, req *llm.CompletionRequest) (*l
 		maxTokens = p.config.DefaultMaxTokens
 	}
 
-	topP := req.TopP
-	if topP == 0 {
-		topP = 1.0 // OpenAI default
+	// GPT-5 reasoning models don't support temperature, top_p, n, presence_penalty, frequency_penalty
+	// Leave them at 0 so omitempty prevents them from being sent in JSON
+	isReasoningModel := strings.HasPrefix(p.model, "gpt-5") || strings.HasPrefix(p.model, "o1") || strings.HasPrefix(p.model, "o3")
+
+	var finalTemp, finalTopP float32
+	if !isReasoningModel {
+		finalTemp = temperature
+		if finalTemp == 0 {
+			finalTemp = p.config.DefaultTemperature
+		}
+		finalTopP = req.TopP
+		if finalTopP == 0 {
+			finalTopP = 1.0 // OpenAI default
+		}
 	}
+	// else: leave at 0 for reasoning models (omitempty will exclude from JSON)
 
 	// Create OpenAI request
 	openaiReq := openai.ChatCompletionRequest{
-		Model:       p.model,
-		Messages:    openaiMessages,
-		Temperature: temperature,
-		MaxTokens:   maxTokens,
-		TopP:        topP,
-		Stop:        req.StopSequences,
+		Model:               p.model,
+		Messages:            openaiMessages,
+		Temperature:         finalTemp,
+		MaxCompletionTokens: maxTokens,
+		TopP:                finalTopP,
+		Stop:                req.StopSequences,
 	}
 
 	// Execute request

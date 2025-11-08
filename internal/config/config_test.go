@@ -26,11 +26,11 @@ func TestLoadFromFile(t *testing.T) {
 				"llm": {
 					"reasoning_llm": {
 						"provider": "openai",
-						"model": "gpt-4o"
+						"model": "gpt-5"
 					},
 					"fast_llm": {
 						"provider": "openai",
-						"model": "gpt-4o-mini"
+						"model": "gpt-5-mini"
 					}
 				},
 				"embedding": {
@@ -72,7 +72,7 @@ func TestLoadFromFile(t *testing.T) {
 					},
 					"fast_llm": {
 						"provider": "openai",
-						"model": "gpt-4o-mini",
+						"model": "gpt-5-mini",
 						"default_temperature": 0.3,
 						"default_max_tokens": 512,
 						"timeout_seconds": 20
@@ -201,10 +201,10 @@ func TestLoadFromEnv(t *testing.T) {
 				if c.LLM.ReasoningLLM.Provider != "openai" {
 					t.Errorf("expected default provider openai, got %s", c.LLM.ReasoningLLM.Provider)
 				}
-				if c.LLM.ReasoningLLM.Model != "gpt-4o" {
+				if c.LLM.ReasoningLLM.Model != "gpt-5" {
 					t.Errorf("expected default model gpt-4, got %s", c.LLM.ReasoningLLM.Model)
 				}
-				if c.LLM.FastLLM.Model != "gpt-4o-mini" {
+				if c.LLM.FastLLM.Model != "gpt-5-mini" {
 					t.Errorf("expected default fast model gpt-3.5-turbo, got %s", c.LLM.FastLLM.Model)
 				}
 				if c.Embedding.Model != "text-embedding-3-small" {
@@ -226,7 +226,7 @@ func TestLoadFromEnv(t *testing.T) {
 				"REASONING_LLM_MODEL":     "claude-3-5-sonnet-20241022",
 				"FAST_LLM_PROVIDER":       "openai",
 				"FAST_LLM_API_KEY":        "test-key-fast",
-				"FAST_LLM_MODEL":          "gpt-4o-mini",
+				"FAST_LLM_MODEL":          "gpt-5-mini",
 				"EMBEDDING_PROVIDER":      "openai",
 				"EMBEDDING_API_KEY":       "test-key-embed",
 				"EMBEDDING_MODEL":         "text-embedding-3-large",
@@ -375,14 +375,14 @@ func TestSaveToFile(t *testing.T) {
 		LLM: LLMConfig{
 			ReasoningLLM: LLMProviderConfig{
 				Provider:           "openai",
-				Model:              "gpt-4o",
+				Model:              "gpt-5",
 				DefaultTemperature: 0.7,
 				DefaultMaxTokens:   2048,
 				TimeoutSeconds:     60,
 			},
 			FastLLM: LLMProviderConfig{
 				Provider:           "openai",
-				Model:              "gpt-4o-mini",
+				Model:              "gpt-5-mini",
 				DefaultTemperature: 0.5,
 				DefaultMaxTokens:   1024,
 				TimeoutSeconds:     30,
@@ -459,7 +459,7 @@ func TestToLLMConfig(t *testing.T) {
 				Provider:           "openai",
 				APIKey:             "test-key",
 				BaseURL:            "https://api.openai.com",
-				Model:              "gpt-4o",
+				Model:              "gpt-5",
 				DefaultTemperature: 0.8,
 				DefaultMaxTokens:   3000,
 				TimeoutSeconds:     90,
@@ -475,7 +475,7 @@ func TestToLLMConfig(t *testing.T) {
 	if llmConfig.APIKey != "test-key" {
 		t.Errorf("expected API key test-key, got %s", llmConfig.APIKey)
 	}
-	if llmConfig.Model != "gpt-4o" {
+	if llmConfig.Model != "gpt-5" {
 		t.Errorf("expected model gpt-4, got %s", llmConfig.Model)
 	}
 	if llmConfig.DefaultTemperature != 0.8 {
