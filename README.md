@@ -171,10 +171,11 @@ Update `.env` with `OPENAI_API_KEY=sk-your-key-here` (or export `OPENAI_API_KEY`
 
 **5. Run Examples:**
 ```bash
-./examples/01_setup.sh && ./examples/02_ingest.sh && ./examples/03_query.sh
+cd examples
+./01_setup.sh && ./02_ingest.sh && ./03_query.sh
 ```
 
-**6. When Done:** Clean up resources (from project root)
+**6. When Done:** Clean up resources
 ```bash
 ./examples/06_cleanup.sh
 ```

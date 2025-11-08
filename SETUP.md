@@ -673,7 +673,7 @@ export GODEBUG=http2debug=2
 
 Now that your setup is complete:
 
-1. **Run the examples**: `./examples/01_setup.sh`
+1. **Run the examples**: `cd examples && ./01_setup.sh`
 2. **Read the examples guide**: [examples/README.md](examples/README.md)
 3. **Try interactive mode**: `./bin/deep-thinking-agent query -interactive`
 4. **Explore advanced features**: Schema analysis, custom collections, hybrid search
