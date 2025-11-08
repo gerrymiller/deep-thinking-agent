@@ -273,9 +273,9 @@ For future runs to minimize costs:
 
 3. **Use cheaper models**
    ```bash
-   # Edit config.json - use gpt-4o-mini for everything
+   # Edit config.json - use gpt-5-mini for everything
    "reasoning_llm": {
-     "model": "gpt-4o-mini"  # Instead of gpt-4o
+     "model": "gpt-5-mini"  # Instead of gpt-5
    }
    ```
 

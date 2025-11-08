@@ -105,12 +105,12 @@ func (p *Provider) Complete(ctx context.Context, req *llm.CompletionRequest) (*l
 
 	// Create OpenAI request
 	openaiReq := openai.ChatCompletionRequest{
-		Model:       p.model,
-		Messages:    openaiMessages,
-		Temperature: temperature,
-		MaxTokens:   maxTokens,
-		TopP:        topP,
-		Stop:        req.StopSequences,
+		Model:               p.model,
+		Messages:            openaiMessages,
+		Temperature:         temperature,
+		MaxCompletionTokens: maxTokens,
+		TopP:                topP,
+		Stop:                req.StopSequences,
 	}
 
 	// Execute request
