@@ -36,7 +36,13 @@ echo ""
 echo "Ingesting a single document with detailed output..."
 ./bin/deep-thinking-agent ingest -verbose examples/documents/sample_research.md
 echo ""
-echo "✓ Single file ingested to default 'documents' collection"
+sleep 1
+if curl -s http://localhost:6333/collections/documents >/dev/null 2>&1; then
+    POINTS=$(curl -s http://localhost:6333/collections/documents | grep -o '"points_count":[0-9]*' | cut -d: -f2)
+    echo "✓ Single file ingested to 'documents' collection ($POINTS chunks total)"
+else
+    echo "⚠️  Collection verification failed"
+fi
 echo ""
 read -p "Press Enter to continue..."
 echo ""
@@ -51,7 +57,13 @@ echo "Ingesting multiple files at once..."
   examples/documents/sample_research.md \
   examples/documents/company_report.md
 echo ""
-echo "✓ Multiple files ingested in a single command"
+sleep 1
+if curl -s http://localhost:6333/collections/documents >/dev/null 2>&1; then
+    POINTS=$(curl -s http://localhost:6333/collections/documents | grep -o '"points_count":[0-9]*' | cut -d: -f2)
+    echo "✓ Multiple files ingested in a single command ($POINTS chunks total)"
+else
+    echo "⚠️  Collection verification failed"
+fi
 echo ""
 read -p "Press Enter to continue..."
 echo ""
@@ -64,7 +76,13 @@ echo ""
 echo "Ingesting all documents in a directory tree..."
 ./bin/deep-thinking-agent ingest -recursive -verbose examples/documents
 echo ""
-echo "✓ All documents in directory tree ingested"
+sleep 1
+if curl -s http://localhost:6333/collections/documents >/dev/null 2>&1; then
+    POINTS=$(curl -s http://localhost:6333/collections/documents | grep -o '"points_count":[0-9]*' | cut -d: -f2)
+    echo "✓ All documents in directory tree ingested ($POINTS chunks total)"
+else
+    echo "⚠️  Collection verification failed"
+fi
 echo ""
 read -p "Press Enter to continue..."
 echo ""
@@ -96,6 +114,22 @@ echo "Creating 'technical' collection for technical guides..."
   -collection technical \
   -verbose \
   examples/documents/technical_guide.txt
+echo ""
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "Verifying All Collections"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+sleep 2
+
+for collection in "documents" "research" "business" "technical"; do
+    if curl -s http://localhost:6333/collections/$collection >/dev/null 2>&1; then
+        INFO=$(curl -s http://localhost:6333/collections/$collection)
+        POINTS=$(echo "$INFO" | grep -o '"points_count":[0-9]*' | cut -d: -f2)
+        echo "✅ $collection: $POINTS chunks"
+    else
+        echo "❌ $collection: not found"
+    fi
+done
 echo ""
 
 echo "✓ Documents organized into domain-specific collections"
