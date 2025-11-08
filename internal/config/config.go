@@ -133,7 +133,7 @@ func LoadFromEnv() *Config {
 			ReasoningLLM: LLMProviderConfig{
 				Provider:           getEnv("REASONING_LLM_PROVIDER", "openai"),
 				APIKey:             getEnv("REASONING_LLM_API_KEY", ""),
-				Model:              getEnv("REASONING_LLM_MODEL", "gpt-5"), // Latest version, supports vision
+				Model:              getEnv("REASONING_LLM_MODEL", "gpt-4o"), // Fast and capable model
 				DefaultTemperature: 0.7,
 				DefaultMaxTokens:   2048,
 				TimeoutSeconds:     60,
@@ -141,7 +141,7 @@ func LoadFromEnv() *Config {
 			FastLLM: LLMProviderConfig{
 				Provider:           getEnv("FAST_LLM_PROVIDER", "openai"),
 				APIKey:             getEnv("FAST_LLM_API_KEY", ""),
-				Model:              getEnv("FAST_LLM_MODEL", "gpt-5-mini"), // Fast model for simple tasks
+				Model:              getEnv("FAST_LLM_MODEL", "gpt-4o-mini"), // Fast model for simple tasks
 				DefaultTemperature: 0.5,
 				DefaultMaxTokens:   1024,
 				TimeoutSeconds:     30,
