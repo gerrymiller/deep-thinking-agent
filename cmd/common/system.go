@@ -20,6 +20,8 @@ import (
 	"deep-thinking-agent/pkg/vectorstore"
 	"deep-thinking-agent/pkg/vectorstore/qdrant"
 	"deep-thinking-agent/pkg/workflow"
+
+	"github.com/google/uuid"
 )
 
 // System encapsulates all components of the deep thinking agent.
@@ -315,7 +317,7 @@ func (s *System) IngestDocument(ctx context.Context, docID string, content strin
 	docs := make([]vectorstore.Document, len(chunks))
 	for i, chunk := range chunks {
 		docs[i] = vectorstore.Document{
-			ID:        fmt.Sprintf("%s_chunk_%d", docID, i),
+			ID:        uuid.New().String(), // Generate valid UUID for Qdrant
 			Content:   chunk,
 			Embedding: embedResp.Vectors[i].Embedding,
 			Metadata:  chunkMetadata[i],
