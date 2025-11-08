@@ -16,24 +16,23 @@ The easiest way to run examples:
 | Script | Purpose | Est. Cost |
 |--------|---------|-----------|
 | `01_setup.sh` | Build and validate setup | Free |
-| `02_ingest.sh` | Ingest 3 sample documents | $0.15-0.30 |
-| `03_query.sh` | Run 4 simple queries | $0.24-0.60 |
-| `04_advanced.sh` | Run 5 complex multi-hop queries | $0.75-1.55 |
-| `05_ingestion_patterns.sh` | Test various ingestion patterns | $0.45-0.90 |
+| `02_ingest.sh` | Ingest 3 sample documents | $0.10-0.20 |
+| `03_query.sh` | Run 4 simple queries | $0.12-0.32 |
+| `04_advanced.sh` | Run 5 complex multi-hop queries | $0.40-0.80 |
+| `05_ingestion_patterns.sh` | Test various ingestion patterns | $0.30-0.60 |
 | `06_cleanup.sh` | Clean up all resources | Free |
 
-**Total cost for all examples: $1.59-3.35**
+**Total cost for all examples: $0.92-1.92**
 
-Run them in order:
+Run them in order from the project root:
 ```bash
-cd examples
-./01_setup.sh
-./02_ingest.sh
-./03_query.sh
-./04_advanced.sh
-./05_ingestion_patterns.sh
+./examples/01_setup.sh
+./examples/02_ingest.sh
+./examples/03_query.sh
+./examples/04_advanced.sh
+./examples/05_ingestion_patterns.sh
 # When done:
-./06_cleanup.sh
+./examples/06_cleanup.sh
 ```
 
 ## Prerequisites
@@ -234,12 +233,12 @@ The system supports multiple document formats:
 {
   "reasoning_llm": {
     "provider": "openai",
-    "model": "gpt-5",              // Use "gpt-5" for best results
+    "model": "gpt-4o",              // Recommended: fast and capable
     "default_temperature": 0.7      // Higher = more creative
   },
   "fast_llm": {
     "provider": "openai",
-    "model": "gpt-5-mini",      // Faster, cheaper for simple tasks
+    "model": "gpt-4o-mini",         // Faster, cheaper for simple tasks
     "default_temperature": 0.5
   }
 }
@@ -259,7 +258,7 @@ The system supports multiple document formats:
 
 ## Performance Tips
 
-1. **Use appropriate models**: gpt-5 for complex reasoning, gpt-5-mini for simple tasks
+1. **Use appropriate models**: gpt-4o for complex reasoning, gpt-4o-mini for simple tasks
 2. **Adjust max_iterations**: Lower for simple queries (faster), higher for complex reasoning
 3. **Tune retrieval parameters**: Increase top_k_retrieval for better recall
 4. **Batch ingestion**: Use `-recursive` flag to ingest multiple documents at once
@@ -269,27 +268,27 @@ The system supports multiple document formats:
 
 ### Per Operation Costs (Approximate)
 
-Based on OpenAI pricing as of 2025:
+Based on OpenAI pricing as of 2025 (using gpt-4o/gpt-4o-mini):
 
 **Document Ingestion:**
-- With schema analysis (default): $0.012-0.052 per document
-- Without schema (`--no-schema`): $0.002-0.005 per document
+- With schema analysis (default): $0.008-0.035 per document
+- Without schema (`--no-schema`): $0.001-0.003 per document
 - Depends on: document length, complexity
 
 **Queries:**
-- Simple query (1-3 iterations): $0.06-0.15
-- Complex query (5-10 iterations): $0.15-0.31
-- Interactive query session (10 queries): $0.60-2.00
+- Simple query (1-3 iterations): $0.03-0.08
+- Complex query (5-10 iterations): $0.08-0.16
+- Interactive query session (10 queries): $0.30-1.00
 - Depends on: query complexity, iterations needed, context length
 
 **Example Scripts Breakdown:**
 | Script | Operations | Estimated Cost |
 |--------|-----------|----------------|
-| 02_ingest.sh | 3 docs with schema | $0.15-0.30 |
-| 03_query.sh | 4 simple queries | $0.24-0.60 |
-| 04_advanced.sh | 5 complex queries (15-20 iter) | $0.75-1.55 |
-| 05_ingestion_patterns.sh | Multiple ingestion modes | $0.45-0.90 |
-| **Total** | | **$1.59-3.35** |
+| 02_ingest.sh | 3 docs with schema | $0.10-0.20 |
+| 03_query.sh | 4 simple queries | $0.12-0.32 |
+| 04_advanced.sh | 5 complex queries (15-20 iter) | $0.40-0.80 |
+| 05_ingestion_patterns.sh | Multiple ingestion modes | $0.30-0.60 |
+| **Total** | | **$0.92-1.92** |
 
 ### Cost Reduction Tips
 
@@ -308,11 +307,11 @@ Based on OpenAI pricing as of 2025:
 3. **Use cheaper models** (edit config.json)
    ```json
    {
-     "reasoning_llm": {"model": "gpt-5-mini"},
-     "fast_llm": {"model": "gpt-5-mini"}
+     "reasoning_llm": {"model": "gpt-4o-mini"},
+     "fast_llm": {"model": "gpt-4o-mini"}
    }
    ```
-   Reduces costs by ~60-80% but may affect quality
+   Reduces costs by ~60-80% but may affect quality for complex reasoning
 
 4. **Start with smaller documents**
    Test with short documents before ingesting large corpora
@@ -339,13 +338,13 @@ When you're done with the examples, clean up resources:
 
 ```bash
 # Automated cleanup (recommended)
-./06_cleanup.sh
+./examples/06_cleanup.sh
 
 # Or with no prompts
-./06_cleanup.sh --force
+./examples/06_cleanup.sh --force
 
 # Remove everything including config and binary
-./06_cleanup.sh --all
+./examples/06_cleanup.sh --all
 ```
 
 This will:
@@ -380,7 +379,7 @@ After running examples:
 
 1. Visit [OpenAI Usage Dashboard](https://platform.openai.com/usage)
 2. Review costs by date and model
-3. Verify charges match expectations (~$2-5 for all examples)
+3. Verify charges match expectations (~$1-2 for all examples)
 
 ## Next Steps
 

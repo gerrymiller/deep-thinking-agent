@@ -20,7 +20,7 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
-    # Group minor and patch updates together
+    # Group all updates together to reduce PR noise
     groups:
       go-dependencies:
         patterns:
@@ -28,6 +28,7 @@ updates:
         update-types:
           - "minor"
           - "patch"
+          - "major"
   
   # GitHub Actions
   - package-ecosystem: "github-actions"
@@ -49,3 +50,12 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
+    # Group all GitHub Actions updates together
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+          - "major"
