@@ -173,6 +173,50 @@ func TestNewPlanner(t *testing.T) {
 	}
 }
 
+func TestParseDependencies(t *testing.T) {
+	tests := []struct {
+		name     string
+		json     string
+		expected []int
+	}{
+		// Standard formats (all models should support)
+		{"empty array", `[]`, []int{}},
+		{"single dep", `[0]`, []int{0}},
+		{"multiple deps", `[0, 1, 2]`, []int{0, 1, 2}},
+
+		// GPT-4o variations
+		{"empty object", `{}`, []int{}},
+
+		// Claude variations
+		{"null", `null`, []int{}},
+		{"nested indices", `{"indices": [0, 1]}`, []int{0, 1}},
+
+		// Edge cases
+		{"empty string", `""`, []int{}},
+		{"quoted array", `"[0,1]"`, []int{0, 1}},
+
+		// Malformed (should not error, return empty)
+		{"invalid json", `{invalid}`, []int{}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := parseDependencies([]byte(tt.json))
+			if err != nil {
+				t.Fatalf("parseDependencies() returned error: %v", err)
+			}
+			if len(result) != len(tt.expected) {
+				t.Errorf("expected length %d, got %d", len(tt.expected), len(result))
+			}
+			for i, v := range tt.expected {
+				if result[i] != v {
+					t.Errorf("expected result[%d]=%d, got %d", i, v, result[i])
+				}
+			}
+		})
+	}
+}
+
 func TestPlan(t *testing.T) {
 	validResponse := `{
 		"steps": [
@@ -188,6 +232,21 @@ func TestPlan(t *testing.T) {
 		"reasoning": "Test reasoning"
 	}`
 
+	// Test with empty object for dependencies (gpt-4o variation)
+	gpt4oVariation := `{
+		"steps": [
+			{
+				"index": 0,
+				"sub_question": "What are the risks?",
+				"tool_type": "doc_search",
+				"schema_hint": "focus on risk sections",
+				"expected_outputs": ["risk factors"],
+				"dependencies": {}
+			}
+		],
+		"reasoning": "Test reasoning"
+	}`
+
 	tests := []struct {
 		name     string
 		provider *mockLLMProvider
@@ -197,6 +256,12 @@ func TestPlan(t *testing.T) {
 		{
 			name:     "successful planning",
 			provider: &mockLLMProvider{response: validResponse},
+			question: "What are the main risks?",
+			wantErr:  false,
+		},
+		{
+			name:     "successful planning with empty object deps",
+			provider: &mockLLMProvider{response: gpt4oVariation},
 			question: "What are the main risks?",
 			wantErr:  false,
 		},
