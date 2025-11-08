@@ -225,7 +225,7 @@ The CLI will automatically load `.env` and `.env.local` files when you run comma
 OPENAI_API_KEY=sk-your-key-here
 
 # .env.local - Local overrides (optional)
-REASONING_LLM_MODEL=gpt-5-mini
+REASONING_LLM_MODEL=gpt-4o-mini
 ```
 
 **Note**: Both `.env` and `.env.local` are already in `.gitignore` to protect your API keys.
@@ -296,7 +296,7 @@ curl https://api.openai.com/v1/models \
 **Cost Reduction Tips:**
 - Use `--no-schema` flag during testing to skip LLM-based schema analysis
 - Start with smaller documents
-- Use `gpt-5-mini` for all LLM operations (edit config.json)
+- Use `gpt-4o-mini` for all LLM operations (edit config.json)
 - Set `max_iterations` lower in config (e.g., 3 instead of 10)
 - Monitor usage at [platform.openai.com/usage](https://platform.openai.com/usage)
 
@@ -377,13 +377,13 @@ The `config.json` file controls all system behavior:
   "llm": {
     "reasoning_llm": {
       "provider": "openai",
-      "model": "gpt-5",
+      "model": "gpt-4o",
       "api_key": "${OPENAI_API_KEY}",
       "default_temperature": 0.7
     },
     "fast_llm": {
       "provider": "openai",
-      "model": "gpt-5-mini",
+      "model": "gpt-4o-mini",
       "api_key": "${OPENAI_API_KEY}",
       "default_temperature": 0.5
     }
@@ -411,9 +411,9 @@ The `config.json` file controls all system behavior:
 
 **LLM Configuration:**
 - `reasoning_llm`: Used for complex tasks (planning, reflection, policy decisions)
-  - Recommended: `gpt-5` for quality, `gpt-5-mini` for cost savings
+  - Recommended: `gpt-4o` for quality, `gpt-4o-mini` for cost savings
 - `fast_llm`: Used for quick tasks (rewriting, distillation, supervision)
-  - Recommended: `gpt-5-mini` for speed and cost
+  - Recommended: `gpt-4o-mini` for speed and cost
 - `temperature`: Controls randomness (0.0 = deterministic, 1.0 = creative)
   - Reasoning: 0.7 (balanced)
   - Fast: 0.5 (more focused)
@@ -443,8 +443,8 @@ Environment variables take precedence over config file:
 
 ```bash
 # LLM settings
-export REASONING_LLM_MODEL=gpt-5-mini
-export FAST_LLM_MODEL=gpt-5-mini
+export REASONING_LLM_MODEL=gpt-4o-mini
+export FAST_LLM_MODEL=gpt-4o-mini
 export OPENAI_API_KEY=sk-your-key
 
 # Vector store settings
