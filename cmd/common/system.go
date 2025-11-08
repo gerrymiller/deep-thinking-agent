@@ -166,9 +166,16 @@ func (s *System) initWorkflow() error {
 	ctx := context.Background()
 
 	// Create agents
+	// For gpt-5 reasoning models, MaxTokens includes reasoning + output tokens
+	// Need much higher limit to allow space for output after reasoning
+	plannerMaxTokens := 2000
+	if strings.HasPrefix(s.Config.LLM.ReasoningLLM.Model, "gpt-5") {
+		plannerMaxTokens = 16000 // Reasoning models need more space
+	}
+
 	planner := agent.NewPlanner(s.ReasoningLLM, &agent.PlannerConfig{
 		Temperature: s.Config.LLM.ReasoningLLM.DefaultTemperature,
-		MaxTokens:   2000,
+		MaxTokens:   plannerMaxTokens,
 	})
 
 	rewriter := agent.NewRewriter(s.FastLLM, &agent.RewriterConfig{
@@ -193,19 +200,29 @@ func (s *System) initWorkflow() error {
 		TopN: s.Config.Workflow.TopNReranking,
 	})
 
+	// Fast LLM agents - increase tokens if using gpt-5-mini (reasoning model)
+	distillerMaxTokens := 1000
+	reflectorMaxTokens := 500
+	policyMaxTokens := 300
+	if strings.HasPrefix(s.Config.LLM.FastLLM.Model, "gpt-5") {
+		distillerMaxTokens = 5000
+		reflectorMaxTokens = 2500
+		policyMaxTokens = 1500
+	}
+
 	distiller := agent.NewDistiller(s.FastLLM, &agent.DistillerConfig{
 		Temperature: 0.3,
-		MaxTokens:   1000,
+		MaxTokens:   distillerMaxTokens,
 	})
 
 	reflector := agent.NewReflector(s.FastLLM, &agent.ReflectorConfig{
 		Temperature: 0.5,
-		MaxTokens:   500,
+		MaxTokens:   reflectorMaxTokens,
 	})
 
 	policy := agent.NewPolicy(s.FastLLM, &agent.PolicyConfig{
 		Temperature: 0.3,
-		MaxTokens:   300,
+		MaxTokens:   policyMaxTokens,
 	})
 
 	// Create workflow nodes
