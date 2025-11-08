@@ -168,11 +168,13 @@ func (s *System) initWorkflow() error {
 	ctx := context.Background()
 
 	// Create agents
-	// For gpt-5 reasoning models, MaxTokens includes reasoning + output tokens
-	// Need much higher limit to allow space for output after reasoning
+	// Reasoning models (gpt-5, o1, o3) need higher token limits for internal reasoning
+	// Standard models (gpt-4o, gpt-4) use reasonable completion limits
 	plannerMaxTokens := 2000
-	if strings.HasPrefix(s.Config.LLM.ReasoningLLM.Model, "gpt-5") {
-		plannerMaxTokens = 16000 // Reasoning models need more space
+	if strings.HasPrefix(s.Config.LLM.ReasoningLLM.Model, "gpt-5") ||
+		strings.HasPrefix(s.Config.LLM.ReasoningLLM.Model, "o1") ||
+		strings.HasPrefix(s.Config.LLM.ReasoningLLM.Model, "o3") {
+		plannerMaxTokens = 16000 // Reasoning models need space for reasoning + output
 	}
 
 	planner := agent.NewPlanner(s.ReasoningLLM, &agent.PlannerConfig{
@@ -202,11 +204,13 @@ func (s *System) initWorkflow() error {
 		TopN: s.Config.Workflow.TopNReranking,
 	})
 
-	// Fast LLM agents - increase tokens if using gpt-5-mini (reasoning model)
+	// Fast LLM agents - increase tokens if using reasoning models
 	distillerMaxTokens := 1000
 	reflectorMaxTokens := 500
 	policyMaxTokens := 300
-	if strings.HasPrefix(s.Config.LLM.FastLLM.Model, "gpt-5") {
+	if strings.HasPrefix(s.Config.LLM.FastLLM.Model, "gpt-5") ||
+		strings.HasPrefix(s.Config.LLM.FastLLM.Model, "o1") ||
+		strings.HasPrefix(s.Config.LLM.FastLLM.Model, "o3") {
 		distillerMaxTokens = 5000
 		reflectorMaxTokens = 2500
 		policyMaxTokens = 1500
