@@ -243,12 +243,12 @@ Example configuration:
   "llm": {
     "reasoning_llm": {
       "provider": "openai",
-      "model": "gpt-4o",
+      "model": "gpt-5",
       "default_temperature": 0.7
     },
     "fast_llm": {
       "provider": "openai",
-      "model": "gpt-4o-mini",
+      "model": "gpt-5-mini",
       "default_temperature": 0.5
     }
   },

@@ -77,6 +77,11 @@ func (s *Store) Insert(ctx context.Context, req *vectorstore.InsertRequest) (*ve
 		collectionName = s.config.DefaultCollection
 	}
 
+	// Ensure collection exists, create if needed
+	if err := s.ensureCollection(ctx, collectionName, req.Documents); err != nil {
+		return nil, fmt.Errorf("failed to ensure collection: %w", err)
+	}
+
 	// Convert documents to Qdrant points
 	points := make([]*pb.PointStruct, 0, len(req.Documents))
 	insertedIDs := make([]string, 0, len(req.Documents))
@@ -358,6 +363,23 @@ func (s *Store) List(ctx context.Context, collectionName string, filter vectorst
 	}
 
 	return documents, nil
+}
+
+// ensureCollection checks if collection exists and creates it if needed.
+func (s *Store) ensureCollection(ctx context.Context, name string, docs []vectorstore.Document) error {
+	// Check if collection exists
+	_, err := s.collections.Get(ctx, &pb.GetCollectionInfoRequest{CollectionName: name})
+	if err == nil {
+		return nil // Collection exists
+	}
+
+	// Collection doesn't exist, create it
+	if len(docs) == 0 || len(docs[0].Embedding) == 0 {
+		return fmt.Errorf("cannot determine vector dimension: no documents with embeddings")
+	}
+
+	dimension := len(docs[0].Embedding)
+	return s.CreateCollection(ctx, name, dimension, nil)
 }
 
 // CreateCollection creates a new collection/index with specified dimensions.

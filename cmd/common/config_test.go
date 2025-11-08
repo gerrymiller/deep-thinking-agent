@@ -28,8 +28,8 @@ func TestLoadConfig_EnvFiles(t *testing.T) {
 	// Create config file without API keys.
 	configContent := `{
         "llm": {
-            "reasoning_llm": {"provider": "openai", "model": "gpt-4o"},
-            "fast_llm": {"provider": "openai", "model": "gpt-4o-mini"}
+            "reasoning_llm": {"provider": "openai", "model": "gpt-5"},
+            "fast_llm": {"provider": "openai", "model": "gpt-5-mini"}
         },
         "embedding": {"provider": "openai", "model": "text-embedding-3-small"},
         "vector_store": {"type": "qdrant", "address": "localhost:6334"},

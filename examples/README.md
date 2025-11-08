@@ -234,12 +234,12 @@ The system supports multiple document formats:
 {
   "reasoning_llm": {
     "provider": "openai",
-    "model": "gpt-4o",              // Use "gpt-4o" for best results
+    "model": "gpt-5",              // Use "gpt-5" for best results
     "default_temperature": 0.7      // Higher = more creative
   },
   "fast_llm": {
     "provider": "openai",
-    "model": "gpt-4o-mini",      // Faster, cheaper for simple tasks
+    "model": "gpt-5-mini",      // Faster, cheaper for simple tasks
     "default_temperature": 0.5
   }
 }
@@ -259,7 +259,7 @@ The system supports multiple document formats:
 
 ## Performance Tips
 
-1. **Use appropriate models**: gpt-4o for complex reasoning, gpt-4o-mini for simple tasks
+1. **Use appropriate models**: gpt-5 for complex reasoning, gpt-5-mini for simple tasks
 2. **Adjust max_iterations**: Lower for simple queries (faster), higher for complex reasoning
 3. **Tune retrieval parameters**: Increase top_k_retrieval for better recall
 4. **Batch ingestion**: Use `-recursive` flag to ingest multiple documents at once
@@ -308,8 +308,8 @@ Based on OpenAI pricing as of 2025:
 3. **Use cheaper models** (edit config.json)
    ```json
    {
-     "reasoning_llm": {"model": "gpt-4o-mini"},
-     "fast_llm": {"model": "gpt-4o-mini"}
+     "reasoning_llm": {"model": "gpt-5-mini"},
+     "fast_llm": {"model": "gpt-5-mini"}
    }
    ```
    Reduces costs by ~60-80% but may affect quality

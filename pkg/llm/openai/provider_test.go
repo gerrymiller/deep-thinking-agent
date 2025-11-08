@@ -167,7 +167,7 @@ func TestProvider_Methods(t *testing.T) {
 
 func TestProvider_ConfigDefaults(t *testing.T) {
 	// Test that default config is applied when nil config provided
-	provider, err := NewProvider("test-key", "gpt-4o", nil)
+	provider, err := NewProvider("test-key", "gpt-5", nil)
 	if err != nil {
 		t.Fatalf("Failed to create provider: %v", err)
 	}
@@ -199,13 +199,13 @@ func TestProvider_CustomConfig(t *testing.T) {
 	customConfig := &llm.Config{
 		Provider:           "openai",
 		APIKey:             "custom-key",
-		Model:              "gpt-4o-mini",
+		Model:              "gpt-5-mini",
 		DefaultTemperature: 0.5,
 		DefaultMaxTokens:   1000,
 		TimeoutSeconds:     30,
 	}
 
-	provider, err := NewProvider("test-key", "gpt-4o", customConfig)
+	provider, err := NewProvider("test-key", "gpt-5", customConfig)
 	if err != nil {
 		t.Fatalf("Failed to create provider: %v", err)
 	}
@@ -230,13 +230,13 @@ func TestProvider_BaseURL(t *testing.T) {
 		Provider:           "openai",
 		APIKey:             "test-key",
 		BaseURL:            "https://custom.openai.endpoint",
-		Model:              "gpt-4o",
+		Model:              "gpt-5",
 		DefaultTemperature: 0.7,
 		DefaultMaxTokens:   2048,
 		TimeoutSeconds:     60,
 	}
 
-	provider, err := NewProvider("test-key", "gpt-4o", config)
+	provider, err := NewProvider("test-key", "gpt-5", config)
 	if err != nil {
 		t.Fatalf("Failed to create provider with custom BaseURL: %v", err)
 	}
@@ -257,13 +257,13 @@ func TestProvider_EmptyBaseURL(t *testing.T) {
 		Provider:           "openai",
 		APIKey:             "test-key",
 		BaseURL:            "", // Empty BaseURL should use default
-		Model:              "gpt-4o",
+		Model:              "gpt-5",
 		DefaultTemperature: 0.7,
 		DefaultMaxTokens:   2048,
 		TimeoutSeconds:     60,
 	}
 
-	provider, err := NewProvider("test-key", "gpt-4o", config)
+	provider, err := NewProvider("test-key", "gpt-5", config)
 	if err != nil {
 		t.Fatalf("Failed to create provider with empty BaseURL: %v", err)
 	}
@@ -274,7 +274,7 @@ func TestProvider_EmptyBaseURL(t *testing.T) {
 }
 
 func TestProvider_MessageValidation(t *testing.T) {
-	provider, err := NewProvider("test-key", "gpt-4o", nil)
+	provider, err := NewProvider("test-key", "gpt-5", nil)
 	if err != nil {
 		t.Fatalf("Failed to create provider: %v", err)
 	}
@@ -337,10 +337,10 @@ func TestProvider_MessageValidation(t *testing.T) {
 
 func TestProvider_ParameterDefaults(t *testing.T) {
 	// Test that request parameters use config defaults when not specified
-	provider, err := NewProvider("test-key", "gpt-4o", &llm.Config{
+	provider, err := NewProvider("test-key", "gpt-5", &llm.Config{
 		Provider:           "openai",
 		APIKey:             "test-key",
-		Model:              "gpt-4o",
+		Model:              "gpt-5",
 		DefaultTemperature: 0.8,
 		DefaultMaxTokens:   1500,
 		TimeoutSeconds:     45,
@@ -362,8 +362,8 @@ func TestProvider_ParameterDefaults(t *testing.T) {
 func TestProvider_ModelVariations(t *testing.T) {
 	// Test that different model names are handled correctly
 	models := []string{
-		"gpt-4o",
-		"gpt-4o-mini",
+		"gpt-5",
+		"gpt-5-mini",
 		"gpt-4-turbo",
 		"gpt-4",
 		"gpt-3.5-turbo",
@@ -384,10 +384,10 @@ func TestProvider_ModelVariations(t *testing.T) {
 }
 
 func TestProvider_ContextHandling(t *testing.T) {
-	provider, err := NewProvider("test-key", "gpt-4o", &llm.Config{
+	provider, err := NewProvider("test-key", "gpt-5", &llm.Config{
 		Provider:           "openai",
 		APIKey:             "test-key",
-		Model:              "gpt-4o",
+		Model:              "gpt-5",
 		DefaultTemperature: 0.7,
 		DefaultMaxTokens:   2048,
 		TimeoutSeconds:     1, // Very short timeout for testing
@@ -420,13 +420,13 @@ func TestProvider_ConfigPreservation(t *testing.T) {
 		Provider:           "openai",
 		APIKey:             "original-key",
 		BaseURL:            "https://original.url",
-		Model:              "gpt-4o",
+		Model:              "gpt-5",
 		DefaultTemperature: 0.9,
 		DefaultMaxTokens:   3000,
 		TimeoutSeconds:     90,
 	}
 
-	provider, err := NewProvider("test-key", "gpt-4o", originalConfig)
+	provider, err := NewProvider("test-key", "gpt-5", originalConfig)
 	if err != nil {
 		t.Fatalf("Failed to create provider: %v", err)
 	}
